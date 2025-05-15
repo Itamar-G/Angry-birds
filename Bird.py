@@ -19,7 +19,7 @@ class Bird(pygame.sprite.Sprite):
         x += self.vx
         y += self.vy
         self.rect.midbottom=x,y
-        if self.rect.midbottom!=(45,315):
+        if self.rect.midbottom!= (45,315):
             self.vy+=1
     
     def update(self,x,y):
