@@ -32,8 +32,3 @@ class Block(pygame.sprite.Sprite):
         # עדכון המלבנים מחדש לפי המרכז הישן
         self.rect = pygame.Rect(0, 0, self.rect.width, self.rect.height)
         self.rect.center = center
-    
-    def Hit(self):
-        self.hit=self.hit+1
-        if self.hit==3:
-            self.rect=None
