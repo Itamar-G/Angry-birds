@@ -9,26 +9,35 @@ class Block(pygame.sprite.Sprite):
         self.height = height
         self.color = color
         
-        self.image = pygame.Surface((width, height))
-        self.image.fill(self.color)
+        self.angle=0
+        self.original_image = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.original_image.fill(color)
         
-        # Set rect to top-left corner of start_pos
-        self.rect = self.image.get_rect()
-        self.rect.topleft = start_pos
-        self.mask=pygame.mask.from_surface(self.image)
+        self.image = self.original_image
+        self.rect = self.image.get_rect(center=start_pos)
+                
+        self.mask = pygame.mask.from_surface(self.image)
+        
+                
         self.hit = 0
 
 
     def update(self):
         pass
     
-    def rotate_90(self):
-        # שמירה על המרכז או המיקום לפני הסיבוב (כדי שלא יקפוץ)
-        center = self.rect.midbottom
+    def Move(self):
+        self.image = pygame.transform.rotate(self.image, self.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+        self.angle+=1
+    
+    def rotate(self, angle):
+        """ Rotate the block by a given angle (in degrees). """
+        self.angle = angle
+        self.image = pygame.transform.rotate(self.original_image, self.angle)
         
-        # החלפת רוחב וגובה (סיבוב של 90 מעלות)
-        self.rect.width, self.rect.height = self.rect.height, self.rect.width
+        # Keep the center consistent
+        old_center = self.rect.center
+        self.rect = self.image.get_rect(center=old_center)
         
-        # עדכון המלבנים מחדש לפי המרכז הישן
-        self.rect = pygame.Rect(0, 0, self.rect.width, self.rect.height)
-        self.rect.center = center
+        # Update mask for collisions
+        self.mask = pygame.mask.from_surface(self.image)

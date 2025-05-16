@@ -13,6 +13,7 @@ def main():
     player=Human_agent()
     run = True
     while(run):
+        pygame.event.pump()
         events=pygame.event.get()
         for event in events:
             if event.type==pygame.QUIT: 
