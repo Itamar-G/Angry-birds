@@ -15,9 +15,9 @@ class Environment:
         self.pigs.add(pig)
 
     def init_blocks (self):
-        block=Block((500,260))
+        block=Block((500,310))
         self.blocks.add(block)
-        block=Block((300,260))
+        block=Block((300,310))
         self.blocks.add(block)
         
 
