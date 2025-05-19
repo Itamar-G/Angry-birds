@@ -19,7 +19,7 @@ def main():
             if event.type==pygame.QUIT: 
                 run=False
         if not env.bird.move:
-            action=player.get_action(events)
+            action=player.get_action(env.bird.rect.midbottom,events)
         env.render()
         env.move(action)
         if env.end_of_game():

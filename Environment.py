@@ -31,13 +31,14 @@ class Environment:
         self.rug=pygame.image.load("img/rug.png")
         self.rug=pygame.transform.scale(self.rug,(60,60))
         self.init_blocks()
-        self.init_pigs((510,260))
+        self.init_pigs((500,260))
         # update bird vx, vy
         # bird.move()
     def move (self, action):
         if action is not None:
             if self.bird.move==False:
-                self.bird.Shoot(action)
+                self.bird.vx=action[0]
+                self.bird.vy=action[1]
                 self.bird.move=True
         if self.bird.move==True:
             self.bird.Move()

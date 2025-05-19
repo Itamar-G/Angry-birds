@@ -27,9 +27,3 @@ class Bird(pygame.sprite.Sprite):
     
     def draw(self,surface):
         surface.blit(self.image,self.rect)
-    
-    def Shoot(self,p):
-        self.vx=(self.rect.midbottom[0]-p[0])/2
-        self.vy=(self.rect.midbottom[1]-p[1])/2
-        self.move=True
-        #להעביר לhuman agent

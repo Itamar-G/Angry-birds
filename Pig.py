@@ -11,6 +11,7 @@ class Pig(pygame.sprite.Sprite):
         self.rect.midbottom=(pos)
         self.mask=pygame.mask.from_surface(self.image)
         self.vy=0
+        self.fall=False
     def draw(self,surface):
         surface.blit(self.image,self.rect)
     def Fall(self):
