@@ -44,16 +44,21 @@ class Environment:
             self.bird.Move()
         bird_group=pygame.sprite.GroupSingle(self.bird)
         pygame.sprite.groupcollide(bird_group,self.pigs,False,True,pygame.sprite.collide_mask)
-        for block in self.blocks:
-            if pygame.sprite.collide_mask(block,self.bird):
-                self.bird.rect.midbottom=(45,315)
-                self.bird.move=False
-                block.angle+=1
-                block.hit+=1
-            if block.hit==2:
-                block.kill()
-            if block.angle>0 and block.angle<90:
-                block.Move()
+        for pig in self.pigs:
+            if pig.stay==False:pig.Fall()
+            pig.stay=False
+            for block in self.blocks:
+                if pygame.sprite.collide_mask(block,pig):
+                    pig.stay=True
+                if pygame.sprite.collide_mask(block,self.bird):
+                    self.bird.rect.midbottom=(45,315)
+                    self.bird.move=False
+                    block.angle+=1
+                    block.hit+=1
+                if block.hit==2:
+                    block.kill()
+                if block.angle>0 and block.angle<90:
+                    block.Move()
         if self.bird.rect.midbottom[1]>450:
             self.bird.rect.midbottom=(45,315)
             self.bird.move=False
