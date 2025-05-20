@@ -53,12 +53,12 @@ class Environment:
                 if pygame.sprite.collide_mask(block,self.bird):
                     self.bird.rect.midbottom=(45,315)
                     self.bird.move=False
-                    block.angle+=1
+                    block.angle-=1
                     block.hit+=1
                 if block.hit==2:
                     block.kill()
-                if block.angle>0 and block.angle<90:
-                    block.Move()
+                if block.angle<360 and block.angle>270:
+                    block.rotate()
         if self.bird.rect.midbottom[1]>450:
             self.bird.rect.midbottom=(45,315)
             self.bird.move=False

@@ -9,7 +9,7 @@ class Block(pygame.sprite.Sprite):
         self.height = height
         self.color = color
         
-        self.angle=0
+        self.angle=360
         self.original_image = pygame.Surface((width, height), pygame.SRCALPHA)
         self.original_image.fill(color)
         
@@ -30,9 +30,9 @@ class Block(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
         self.angle+=1
     
-    def rotate(self, angle):
+    def rotate(self):
         """ Rotate the block by a given angle (in degrees). """
-        self.angle = angle
+        self.angle-=1
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         
         # Keep the center consistent
