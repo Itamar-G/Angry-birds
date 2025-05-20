@@ -31,13 +31,12 @@ class Block(pygame.sprite.Sprite):
         self.angle+=1
     
     def rotate(self):
-        """ Rotate the block by a given angle (in degrees). """
-        self.angle-=1
+        """ Rotate the block by a given angle (in degrees) around its bottom center. """
+        self.angle -= 3
         self.image = pygame.transform.rotate(self.original_image, self.angle)
         
-        # Keep the center consistent
-        old_center = self.rect.center
-        self.rect = self.image.get_rect(center=old_center)
-        
+        # Keep the bottom center consistent
+        old_midbottom = self.rect.midbottom
+        self.rect = self.image.get_rect(midbottom=old_midbottom)
         # Update mask for collisions
         self.mask = pygame.mask.from_surface(self.image)

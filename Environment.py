@@ -51,6 +51,7 @@ class Environment:
                 if pygame.sprite.collide_mask(block,pig):
                     pig.stay=True
                 if pygame.sprite.collide_mask(block,self.bird):
+                    block.rect.midbottom=(block.rect.midbottom[0]+50,block.rect.midbottom[1])
                     self.bird.rect.midbottom=(45,315)
                     self.bird.move=False
                     block.angle-=1
@@ -59,9 +60,15 @@ class Environment:
                     block.kill()
                 if block.angle<360 and block.angle>270:
                     block.rotate()
+                if pygame.sprite.collide_mask(pig,block) and pig.vy>10:
+                    pig.kill()
         if self.bird.rect.midbottom[1]>450:
             self.bird.rect.midbottom=(45,315)
             self.bird.move=False
+        if len(self.pigs)==0:
+            for block in self.blocks:
+                if block.angle<360 and block.angle>270:
+                    block.rotate()
     def render (self):
         # draw background to clear
         # draw rugs on screen
