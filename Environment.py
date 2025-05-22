@@ -9,6 +9,7 @@ class Environment:
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
+        self.tries=3
 
     def init_pigs (self,pos):
         pig=Pig(pos)
@@ -54,6 +55,7 @@ class Environment:
                 if pygame.sprite.collide_mask(block,self.bird):
                     block.rect.midbottom=(block.rect.midbottom[0]+self.bird.vx*2+30,block.rect.midbottom[1])
                     self.bird.rect.midbottom=(45,315)
+                    self.tries-=1
                     self.bird.move=False
                     block.angle-=1
                     block.hit+=1
@@ -65,11 +67,12 @@ class Environment:
                     if pig.vy>10:
                         pig.kill()
                     else: pig.stay=True
-                if pig.rect.midbottom[1]>380:
+                if pig.rect.midbottom[1]>350:
                     if pig.vy>10: pig.kill()
                     else:pig.stay=True
-        if self.bird.rect.midbottom[1]>450:
+        if self.bird.rect.midbottom[1]>400:
             self.bird.rect.midbottom=(45,315)
+            self.tries-=1
             self.bird.move=False
         if len(self.pigs)==0:
             for block in self.blocks:
@@ -92,6 +95,8 @@ class Environment:
         self.clock.tick(FPS)
 
     def end_of_game (self):
+        if len(self.pigs)==0:return True
+        if self.tries==0: return True
         return False
     def state(self):
         state_list=[]
