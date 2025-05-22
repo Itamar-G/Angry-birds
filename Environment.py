@@ -32,6 +32,7 @@ class Environment:
         self.rug=pygame.transform.scale(self.rug,(60,60))
         self.init_blocks()
         self.init_pigs((500,260))
+        self.init_pigs((300,260))
         # update bird vx, vy
         # bird.move()
     def move (self, action):
@@ -51,7 +52,7 @@ class Environment:
                 if pygame.sprite.collide_mask(block,pig):
                     pig.stay=True
                 if pygame.sprite.collide_mask(block,self.bird):
-                    block.rect.midbottom=(block.rect.midbottom[0]+50,block.rect.midbottom[1])
+                    block.rect.midbottom=(block.rect.midbottom[0]+self.bird.vx*2+30,block.rect.midbottom[1])
                     self.bird.rect.midbottom=(45,315)
                     self.bird.move=False
                     block.angle-=1
@@ -60,8 +61,13 @@ class Environment:
                     block.kill()
                 if block.angle<360 and block.angle>270:
                     block.rotate()
-                if pygame.sprite.collide_mask(pig,block) and pig.vy>10:
-                    pig.kill()
+                if pygame.sprite.collide_mask(pig,block):
+                    if pig.vy>10:
+                        pig.kill()
+                    else: pig.stay=True
+                if pig.rect.midbottom[1]>380:
+                    if pig.vy>10: pig.kill()
+                    else:pig.stay=True
         if self.bird.rect.midbottom[1]>450:
             self.bird.rect.midbottom=(45,315)
             self.bird.move=False

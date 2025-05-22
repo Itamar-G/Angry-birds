@@ -19,4 +19,3 @@ class Pig(pygame.sprite.Sprite):
         y += self.vy
         self.rect.midbottom=x,y
         self.vy+=1
-        if self.rect.midbottom[1]>350:self.image=None
