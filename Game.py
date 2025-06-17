@@ -10,19 +10,25 @@ from Human_agent import Human_agent
 def main():
     env = Environment()
     env.init_display()
-    player=Human_agent()
+    player = Human_agent()
     run = True
-    while(run):
+
+    while run:
         pygame.event.pump()
-        events=pygame.event.get()
+        events = pygame.event.get()
         for event in events:
-            if event.type==pygame.QUIT: 
-                run=False
+            if event.type == pygame.QUIT:
+                run = False
+
         if not env.bird.move:
-            action=player.get_action(env.bird.rect.midbottom,events)
+            action = player.get_action(env.bird.rect.midbottom, events)
+
         env.render()
         env.move(action)
+
         if env.end_of_game():
             run = False
-        
+
+    pygame.quit()
+    sys.exit()
 if __name__=='__main__': main()

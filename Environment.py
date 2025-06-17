@@ -3,13 +3,16 @@ from Bird import Bird
 from Graphic import *
 from Block import Block
 from Pig import Pig
+import random
 
 class Environment:
     def __init__(self):
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
-        self.tries=3
+        self.tries = 3
+        self.level = 1
+        self.screen = None
 
     def init_pigs (self,pos):
         pig=Pig(pos)
@@ -20,22 +23,38 @@ class Environment:
         self.blocks.add(block)
         block=Block((300,310))
         self.blocks.add(block)
+    def init_level(self, level_num):
+        self.pigs.empty()
+        self.blocks.empty()
+
+        num_pigs = random.randint(2, 3)
+        num_blocks = random.randint(2, 4)
+
+        # חזירים רנדומליים
+        for _ in range(num_pigs):
+            x = random.randint(400, 650)
+            y = random.randint(200, 300)
+            self.init_pigs((x, y))
+
+        # בלוקים רנדומליים
+        for _ in range(num_blocks):
+            x = random.randint(250, 600)
+            y = 310
+            block = Block((x, y))
+            self.blocks.add(block)
+
         
 
-    def init_display (self):
+    def init_display(self):
         pygame.init()
-        self.screen=pygame.display.set_mode((WIDTH,HEIGHT))
-        pygame.display.set_caption("Angry birds")
-        self.clock=pygame.time.Clock()
-        self.background=pygame.image.load("img/background.webp")
-        self.background=pygame.transform.scale(self.background,(WIDTH,HEIGHT))
-        self.rug=pygame.image.load("img/rug.png")
-        self.rug=pygame.transform.scale(self.rug,(60,60))
-        self.init_blocks()
-        self.init_pigs((500,260))
-        self.init_pigs((300,260))
-        # update bird vx, vy
-        # bird.move()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Angry Birds")
+        self.clock = pygame.time.Clock()
+        self.background = pygame.image.load("img/background.webp")
+        self.background = pygame.transform.scale(self.background, (WIDTH, HEIGHT))
+        self.rug = pygame.image.load("img/rug.png")
+        self.rug = pygame.transform.scale(self.rug, (60, 60))
+        self.init_level(self.level)
     def move (self, action):
         if action is not None:
             if self.bird.move==False:
@@ -78,6 +97,14 @@ class Environment:
             for block in self.blocks:
                 if block.angle<360 and block.angle>270:
                     block.rotate()
+        if len(self.pigs) == 0:
+            self.level += 1
+            if self.level > 3:
+                self.tries = 0  # סוף המשחק
+            else:
+                self.bird.rect.midbottom = (45, 315)
+                self.bird.move = False
+                self.init_level(self.level)
     def render (self):
         # draw background to clear
         # draw rugs on screen
