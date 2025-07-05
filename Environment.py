@@ -10,7 +10,7 @@ class Environment:
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
-        self.tries = 4
+        self.tries = 3
         self.level = 1
         self.screen = None
 
@@ -25,7 +25,7 @@ class Environment:
         self.blocks.add(block)
 
     def init_level(self, level_num):
-        self.tries = 4
+        self.tries = 3
         self.pigs.empty()
         self.blocks.empty()
 
@@ -65,10 +65,6 @@ class Environment:
                 self.bird.vy=action[1]
                 self.bird.move=True
                 self.tries-=1
-                if self.tries==0:
-                    restart=pygame.image.load("img/restart.png")
-                    restart=pygame.transform.scale(restart,(30,30))
-                    self.screen.blit()
         if self.bird.move==True:
             self.bird.Move()
         bird_group=pygame.sprite.GroupSingle(self.bird)
@@ -130,8 +126,14 @@ class Environment:
         self.clock.tick(FPS)
 
     def end_of_game (self):
+        if self.bird.move:
+            return False
+        for block in self.blocks:
+            if block.angle<360 and block.angle>270:
+                return False
         if len(self.pigs)==0:return True
-        if self.tries==0: return True
+        if self.tries==0: 
+            return True
         return False
     def state(self):
         state_list=[]
