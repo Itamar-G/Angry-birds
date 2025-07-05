@@ -10,7 +10,7 @@ class Environment:
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
-        self.tries = 3
+        self.tries = 4
         self.level = 1
         self.screen = None
 
@@ -25,7 +25,7 @@ class Environment:
         self.blocks.add(block)
 
     def init_level(self, level_num):
-        self.tries = 3
+        self.tries = 4
         self.pigs.empty()
         self.blocks.empty()
 
@@ -64,6 +64,7 @@ class Environment:
                 self.bird.vx=action[0]
                 self.bird.vy=action[1]
                 self.bird.move=True
+                self.tries-=1
         if self.bird.move==True:
             self.bird.Move()
         bird_group=pygame.sprite.GroupSingle(self.bird)
@@ -77,7 +78,7 @@ class Environment:
                 if pygame.sprite.collide_mask(block,self.bird):
                     block.rect.midbottom=(block.rect.midbottom[0]+self.bird.vx*2+30,block.rect.midbottom[1])
                     self.bird.rect.midbottom=(45,315)
-                    self.tries-=1
+                    
                     self.bird.move=False
                     block.angle-=1
                     block.hit+=1
@@ -94,7 +95,7 @@ class Environment:
                     else:pig.stay=True
         if self.bird.rect.midbottom[1]>400:
             self.bird.rect.midbottom=(45,315)
-            self.tries-=1
+            
             self.bird.move=False
         if len(self.pigs)==0:
             for block in self.blocks:
