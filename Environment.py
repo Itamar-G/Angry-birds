@@ -23,27 +23,30 @@ class Environment:
         self.blocks.add(block)
         block=Block((300,310))
         self.blocks.add(block)
+
     def init_level(self, level_num):
+        self.tries = 3
         self.pigs.empty()
         self.blocks.empty()
 
         num_pigs = random.randint(2, 3)
-        num_blocks = random.randint(2, 4)
+        num_blocks = random.randint(num_pigs, 4)  # לפחות בלוק אחד לכל חזיר
 
-        # חזירים רנדומליים
-        for _ in range(num_pigs):
-            x = random.randint(400, 650)
-            y = random.randint(200, 300)
-            self.init_pigs((x, y))
-
-        # בלוקים רנדומליים
+        # צור בלוקים רנדומליים
+        block_positions = []
         for _ in range(num_blocks):
             x = random.randint(250, 600)
             y = 310
             block = Block((x, y))
             self.blocks.add(block)
+            block_positions.append((x, y))
 
-        
+        # מיקום חזירים מעל בלוקים (אחד לכל בלוק)
+        selected_blocks = random.sample(block_positions, num_pigs)
+        for pos in selected_blocks:
+            x, y = pos
+            pig_y = y - 40  # גובה החזיר מעל הבלוק
+            self.init_pigs((x, pig_y))
 
     def init_display(self):
         pygame.init()
