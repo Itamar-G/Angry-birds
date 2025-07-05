@@ -65,6 +65,10 @@ class Environment:
                 self.bird.vy=action[1]
                 self.bird.move=True
                 self.tries-=1
+                if self.tries==0:
+                    restart=pygame.image.load("img/restart.png")
+                    restart=pygame.transform.scale(restart,(30,30))
+                    self.screen.blit()
         if self.bird.move==True:
             self.bird.Move()
         bird_group=pygame.sprite.GroupSingle(self.bird)
