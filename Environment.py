@@ -39,7 +39,7 @@ class Environment:
                 is_horizontal = random.random() < 0.3  # 30% מהבלוקים יהיו שוכבים
                 width = 60 if is_horizontal else 20
                 height = 20 if is_horizontal else 60
-                y = 310 - (i * height)
+                y = 360 - (i * height)
                 block = Block((x, y), width=width, height=height)
                 self.blocks.add(block)
 
@@ -87,7 +87,7 @@ class Environment:
             if pig.rect.bottom >= 310:
                 pig.stay = True
 
-            if pig.vy > 10 and pig.rect.bottom > 350:
+            if pig.vy > 20 and pig.rect.bottom < 350 and self.tries<3:
                 pig.kill()
 
         # עדכון בלוקים
