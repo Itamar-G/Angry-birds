@@ -4,15 +4,20 @@ from Graphic import *
 from Block import Block
 from Pig import Pig
 import random
+from State import State 
 
 class Environment:
-    def __init__(self):
+    def __init__(self,state: State = None):
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
         self.tries = 3
         self.level = 1
         self.screen = None
+        if state:
+            self.state : State = state
+        else:
+            self.state = State()
 
     def init_pigs (self,pos):
         pig=Pig(pos)
@@ -29,11 +34,11 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = random.randint(2, 4)
+        num_buildings = 1#random.randint(2, 4)
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
-            num_floors = random.randint(2, 4)
+            num_floors = 2#random.randint(2, 4)
 
             for i in range(num_floors):
                 is_horizontal = random.random() < 0.3  # 30% מהבלוקים יהיו שוכבים
@@ -57,98 +62,156 @@ class Environment:
         self.rug = pygame.transform.scale(self.rug, (60, 60))
         self.init_level(self.level)
     def move(self, action):
+        # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
         if action is not None:
             if not self.bird.move:
-                self.bird.vx = action[0]
-                self.bird.vy = action[1]
+                self.bird.vx = (action[0] + 1) * 5
+                self.bird.vy = (action[1] - 1) * (-5)
                 self.bird.move = True
                 self.tries -= 1
-
         # תנועת הציפור
         if self.bird.move:
             self.bird.Move()
 
-        # בדיקת פגיעות בציפורים מול חזירים
+        # גיבוש קבוצות sprites לציפור / חזירים
         bird_group = pygame.sprite.GroupSingle(self.bird)
-        pygame.sprite.groupcollide(bird_group, self.pigs, False, True, pygame.sprite.collide_mask)
 
-        # עדכון חזירים
-        for pig in self.pigs:
+        # התנגשויות ציפור-חזירים
+        killed = pygame.sprite.groupcollide(bird_group, self.pigs, False, True, pygame.sprite.collide_mask)
+        # עדכון חזירים: נפילה, בדיקות קרקע וכו׳
+        for pig in list(self.pigs):
             pig.stay = False
-
             for block in self.blocks:
                 if pygame.sprite.collide_mask(pig, block):
                     pig.stay = True
                     break
-
             if not pig.stay:
                 pig.Fall()
-
             if pig.rect.bottom >= 310:
                 pig.stay = True
-
-            if pig.vy > 20 and pig.rect.bottom < 350 and self.tries<3:
-                pig.kill()
-
-        # עדכון בלוקים
+        # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
         for block in list(self.blocks):
             block.falling = True
-
-            # אם על הקרקע – לא ליפול
             if block.rect.bottom >= 310:
                 block.falling = False
-
-            # בדיקת התנגשויות עם בלוקים אחרים
             for other in self.blocks:
                 if block is not other:
                     if pygame.sprite.collide_mask(block, other):
-                        # בלוק מונח על אחר
                         if abs(block.rect.bottom - other.rect.top) < 5:
                             block.falling = False
-
-                        # בלוק פוגע מלמעלה בבלוק אחר – גורם לו ליפול
                         if block.vy > 0 and abs(block.rect.top - other.rect.bottom) < 5:
                             other.falling = True
                             other.vy += block.vy // 2
-
-            # פגיעה בציפור
             if pygame.sprite.collide_mask(block, self.bird):
-                block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30, block.rect.midbottom[1])
+                block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx*2 + 30,
+                                        block.rect.midbottom[1])
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
                 block.angle -= 1
                 block.hit += 1
-
-            # השמדת בלוק לאחר 2 פגיעות
             if block.hit >= 2:
                 block.kill()
-
-            # סיבוב בלוק
             if 270 < block.angle < 360:
                 block.rotate()
-
-            # הפעלת נפילה אם צריך
             block.fall()
 
-        # ציפור נופלת לקרקע – אפס אותה
+        # ציפור נופלת לקרקע — אפס
         if self.bird.rect.midbottom[1] > 400:
             self.bird.rect.midbottom = (45, 315)
             self.bird.move = False
+    
+    def fast_move(self, action):
+         # אתחול משתנים
+        next_state = None
+        reward = 0
+        done = False
 
-        # אם אין חזירים – סיים שלב או עלה שלב
-        if len(self.pigs) == 0:
-            for block in self.blocks:
+        # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
+        if action is not None:
+            if not self.bird.move:
+                self.bird.vx = (action[0] + 1) * 5
+                self.bird.vy = (action[1] - 1) * (-5)
+                self.bird.move = True
+                self.tries -= 1
+                reward += -1
+
+        # — בצע את שאר הלוגיקה של movement / פיזיקה / התנגשויות וכו׳
+        # תנועת הציפור
+        self.bird.Move()
+        while self.bird.move:
+            # גיבוש קבוצות sprites לציפור / חזירים
+            bird_group = pygame.sprite.GroupSingle(self.bird)
+
+            # התנגשויות ציפור-חזירים
+            killed = pygame.sprite.groupcollide(bird_group, self.pigs, False, True, pygame.sprite.collide_mask)
+            if killed:
+                # אם פגעה בחזיר — תגמול חיובי
+                reward += +50  # תתאים לפי טווח שלך
+
+            # עדכון חזירים: נפילה, בדיקות קרקע וכו׳
+            for pig in list(self.pigs):
+                pig.stay = False
+                for block in self.blocks:
+                    if pygame.sprite.collide_mask(pig, block):
+                        pig.stay = True
+                        break
+                if not pig.stay:
+                    pig.Fall()
+                if pig.rect.bottom >= 310:
+                    pig.stay = True
+                    reward += 50
+
+
+            # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
+            for block in list(self.blocks):
+                block.falling = True
+                if block.rect.bottom >= 310:
+                    block.falling = False
+                for other in self.blocks:
+                    if block is not other:
+                        if pygame.sprite.collide_mask(block, other):
+                            if abs(block.rect.bottom - other.rect.top) < 5:
+                                block.falling = False
+                            if block.vy > 0 and abs(block.rect.top - other.rect.bottom) < 5:
+                                other.falling = True
+                                other.vy += block.vy // 2
+                if pygame.sprite.collide_mask(block, self.bird):
+                    block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx*2 + 30,
+                                            block.rect.midbottom[1])
+                    self.bird.rect.midbottom = (45, 315)
+                    self.bird.move = False
+                    block.angle -= 1
+                    block.hit += 1
+                    reward+=5
+                if block.hit >= 2:
+                    block.kill()
                 if 270 < block.angle < 360:
                     block.rotate()
+                block.fall()
 
-            self.level += 1
-            if self.level > 3:
-                self.tries = 0  # סוף המשחק
-            else:
+            # ציפור נופלת לקרקע — אפס
+            if self.bird.rect.midbottom[1] > 400:
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
-                self.init_level(self.level)
 
+            # אם אין עוד חזירים — שלב נגמר / קבוצה הושמדה
+            if len(self.pigs) == 0:
+                # תגמול גדול על סיום שלב
+                reward += +50
+                # אפשר גם להכין מעבר לשלב/איפוס — תלוי איך אתה רוצה RL
+                done = True
+            # או אם נגמרו הניסיונות
+            elif self.tries <= 0:
+                done = True
+                # אפשר עונש קטן על כישלון
+                reward += -30
+
+            # … כל לוגיקה נוספת שאתה רוצה: לדוגמה time penalty, נזק, יכולת ירייה מחדש, וכו׳
+
+            # בסוף: קבל מצב חדש
+        next_state = self.state
+        return next_state, reward, done
+    
     def render (self):
         # draw background to clear
         # draw rugs on screen
@@ -175,13 +238,21 @@ class Environment:
         if self.tries==0: 
             return True
         return False
-    def state(self):
-        state_list=[]
-        index=0
-        for sprite in self.pigs:
-            state_list.append(sprite.rect.centerx)
-            state_list.append(sprite.rect.centery)
-            state_list.append(sprite.vx)
-            state_list.append(sprite.vy)
-            index+=4
-        
+    
+    def reset(self):
+        # אתחל את הסביבה מחדש
+        self.level = 1
+        self.tries = 3
+        self.pigs.empty()
+        self.blocks.empty()
+        # אתחל HUD / ריסט של bird
+        self.bird = Bird()
+        # אתחול מחדש של stage/level
+        self.init_level(self.level)
+        # אם צריך — גם אתחול של display / screen
+        # self.init_display()  # תלוי אם אתה רוצה לפתוח חלון מחדש
+        # החזר וקטור מצב התחלתי  
+        return self.state()
+    def is_win(self):
+        if len(self.pigs)==0: return True
+        return False
