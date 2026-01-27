@@ -160,6 +160,8 @@ class Environment:
                 if pig.rect.bottom >= 310:
                     pig.stay = True
                     reward += 50
+                if self.bird.rect.midbottom[1] < pig.rect.midbottom[1]+20 and self.bird.rect.midbottom[1] > pig.rect.midbottom[1]-20:
+                    reward+=50/(abs(self.bird.rect.midbottom[0]-pig.rect.midbottom[0]))
 
 
             # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
