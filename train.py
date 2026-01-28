@@ -5,7 +5,7 @@ from ReplayBuffer import ReplayBuffer
 from State import State
 
 import torch 
-epochs = 5000000
+epochs = 500000
 C = 300
 batch = 64
 learning_rate = 0.1
@@ -14,6 +14,7 @@ path = "Data/DQN_PARAM_Advanced_2.pth"
 def train():
     state=State()
     env = Environment(state)
+    env.init_display()
     player = DQN_Agent()
     replay = ReplayBuffer()
     Q = player.DQN
@@ -28,13 +29,16 @@ def train():
         state=env.state
         while not env.end_of_game():
             action = player.get_action(state, epoch=epoch)
-            next_state, reward, done = env.fast_move(action)
+            next_state, reward, done = env.move(action)
+            while env.bird.move:
+                env.render()
+                next_state, reward, done = env.move(None)
             pigs=len(env.pigs)
             tries=env.tries
             if env.end_of_game():
-                replay.push(state, action, reward, next_state, env.end_of_game())
+                replay.push(env,state, action, reward, next_state, env.end_of_game())
                 break
-            replay.push(state, action, reward, next_state, env.end_of_game())
+            replay.push(env, state, action, reward, next_state, env.end_of_game())
             state = next_state
             if epoch < 5000:
                 continue

@@ -63,12 +63,17 @@ class Environment:
         self.init_level(self.level)
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
+        next_state=self.state
+        reward=0
+        done = False
+        pigs_num=len(self.pigs)
         if action is not None:
             if not self.bird.move:
                 self.bird.vx = (action[0] + 1) * 5
                 self.bird.vy = (action[1] - 1) * (-5)
                 self.bird.move = True
                 self.tries -= 1
+                reward-=1
         # תנועת הציפור
         if self.bird.move:
             self.bird.Move()
@@ -89,6 +94,7 @@ class Environment:
                 pig.Fall()
             if pig.rect.bottom >= 310:
                 pig.stay = True
+                reward+=10
         # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
         for block in list(self.blocks):
             block.falling = True
@@ -97,12 +103,14 @@ class Environment:
             for other in self.blocks:
                 if block is not other:
                     if pygame.sprite.collide_mask(block, other):
+                        reward+=2
                         if abs(block.rect.bottom - other.rect.top) < 5:
                             block.falling = False
                         if block.vy > 0 and abs(block.rect.top - other.rect.bottom) < 5:
                             other.falling = True
                             other.vy += block.vy // 2
             if pygame.sprite.collide_mask(block, self.bird):
+                reward+=5
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx*2 + 30,
                                         block.rect.midbottom[1])
                 self.bird.rect.midbottom = (45, 315)
@@ -119,6 +127,10 @@ class Environment:
         if self.bird.rect.midbottom[1] > 400:
             self.bird.rect.midbottom = (45, 315)
             self.bird.move = False
+        next_state=self.state
+        reward+=pigs_num-len(self.pigs)*10
+        if self.end_of_game(): done = True
+        return next_state, reward, done
     
     def fast_move(self, action):
          # אתחול משתנים

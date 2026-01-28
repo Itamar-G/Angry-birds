@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 class State:
-    def __init__(self, max_pigs=5, max_blocks=20):
+    def __init__(self, max_pigs=1, max_blocks=2):
         self.max_pigs = max_pigs
         self.max_blocks = max_blocks
     
@@ -40,9 +40,11 @@ class State:
         # Fill remaining blocks
         for _ in range(self.max_blocks - len(block_list)):
             state_list += [0, 0, 0, 0, 0, 0]
-        state_list = np.array(state_list, dtype=np.float32)
-        state_torch = torch.from_numpy(state_list)
-    
+        return state_list
+    def toTensor (self,env, device = torch.device('cpu')):
+        state_list = np.array(self.build(env), dtype=np.float32)
+        tensor = torch.from_numpy(state_list)
+        return tensor
     [staticmethod]
     def tensor_to_state_list(state_tensor):
         if state_tensor.is_cuda:

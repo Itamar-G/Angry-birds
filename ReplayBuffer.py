@@ -6,13 +6,27 @@ from State import State
 
 
 class ReplayBuffer:
-    def __init__(self, capacity= 10000) -> None:
+    def __init__(self, capacity=10000) -> None:
         self.buffer = deque(maxlen=capacity)
 
-    def push (self, state : State, action, reward, next_state : State, done):
-        self.buffer.append((state.toTensor(), torch.from_numpy(np.array(action)), 
-                            torch.tensor(reward), next_state.toTensor(), torch.tensor(done)))
+    def push(self, env, state, action, reward, next_state, done):
+        # המרה לטנזור בעזרת הפונקציה שכבר כתבת ב-State
+        if hasattr(state, 'toTensor'):
+            s_tensor = state.toTensor(env)
+        else:
+            s_tensor = torch.tensor(state, dtype=torch.float32)
 
+        if hasattr(next_state, 'toTensor'):
+            ns_tensor = next_state.toTensor(env)
+        else:
+            ns_tensor = torch.tensor(next_state, dtype=torch.float32)
+
+        # יצירת טנזורים לשאר הערכים
+        action_tensor = torch.tensor(action, dtype=torch.float32)
+        reward_tensor = torch.tensor(reward, dtype=torch.float32).reshape(1)
+        done_tensor = torch.tensor(done, dtype=torch.float32).reshape(1)
+
+        self.buffer.append((s_tensor, action_tensor, reward_tensor, ns_tensor, done_tensor))
     def push_tensors (self, state_tensor, action_tensor, reward_tensor, next_state_tensor, done):
         self.buffer.append((state_tensor, action_tensor, reward_tensor, next_state_tensor, done))
             
