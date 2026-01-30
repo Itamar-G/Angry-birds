@@ -76,7 +76,12 @@ class Environment:
                 reward-=1
         # תנועת הציפור
         if self.bird.move:
-            self.bird.Move()
+            check=True
+            for block in list(self.blocks):
+                if 270 < block.angle < 360:
+                    check=False
+            if check:
+                self.bird.Move()
 
         # גיבוש קבוצות sprites לציפור / חזירים
         bird_group = pygame.sprite.GroupSingle(self.bird)
@@ -266,7 +271,7 @@ class Environment:
         # אם צריך — גם אתחול של display / screen
         # self.init_display()  # תלוי אם אתה רוצה לפתוח חלון מחדש
         # החזר וקטור מצב התחלתי  
-        return self.state()
+        return self.state
     def is_win(self):
         if len(self.pigs)==0: return True
         return False

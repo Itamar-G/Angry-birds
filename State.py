@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 class State:
-    def __init__(self, max_pigs=1, max_blocks=2):
+    def __init__(self, max_pigs=5, max_blocks=20):
         self.max_pigs = max_pigs
         self.max_blocks = max_blocks
     

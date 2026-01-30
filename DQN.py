@@ -8,10 +8,10 @@ from Environment import Environment
 from State import State
 import os
 env=Environment()
-input_size = 131
+input_size = 133
 layer1 = 128
 layer2 = 64
-output_size = 2
+output_size = 1
 gamma = 0.99 
 MSELoss = nn.MSELoss()
 class DQN(nn.Module):

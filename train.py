@@ -15,7 +15,7 @@ def train():
     state=State()
     env = Environment(state)
     env.init_display()
-    player = DQN_Agent()
+    player = DQN_Agent(env=env)
     replay = ReplayBuffer()
     Q = player.DQN
     Q_hat :DQN = Q.copy()
@@ -23,15 +23,15 @@ def train():
     optim = torch.optim.SGD(Q.parameters(), lr=learning_rate)
 
     for epoch in range(epochs):
-        pigs=0
-        tries=0
+        env.reset()
+        pigs=len(env.pigs)
+        tries=env.tries
         print (epoch, end="\r")
         state=env.state
-        while not env.end_of_game():
+        while not env.end_of_game() and pigs>0 and tries>0:
             action = player.get_action(state, epoch=epoch)
             next_state, reward, done = env.move(action)
             while env.bird.move:
-                env.render()
                 next_state, reward, done = env.move(None)
             pigs=len(env.pigs)
             tries=env.tries
