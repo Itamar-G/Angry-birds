@@ -5,7 +5,7 @@ from ReplayBuffer import ReplayBuffer
 from State import State
 
 import torch 
-epochs = 50000
+epochs = 500000
 C = 300
 batch = 64
 learning_rate = 0.1
