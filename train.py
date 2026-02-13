@@ -8,7 +8,7 @@ import numpy as np
 
 import torch 
 epochs = 10000
-C = 1
+C = 500
 batch = 64
 learning_rate = 0.1
 path = "Data/DQN_PARAM_Advanced_2.pth"
@@ -23,9 +23,10 @@ def train():
     Q_hat :DQN = Q.copy()
     Q_hat.train = False
     optim = torch.optim.SGD(Q.parameters(), lr=learning_rate)
-    tries_history = []
+    success_rate = []
 
     for epoch in range(epochs):
+        if epoch%C==0: success_rate.append(0) 
         env.reset()
         pigs=len(env.pigs)
         tries=env.tries
@@ -36,6 +37,8 @@ def train():
             next_state, reward, done = env.move(action)
             while env.bird.move:
                 next_state, reward, done = env.move(None)
+                env.render()
+            print(env.calculate_ballistic_distance(45,315,action,400,45))
             pigs=len(env.pigs)
             tries=env.tries
             if env.end_of_game():
@@ -55,23 +58,19 @@ def train():
             loss.backward()
             optim.step()
             optim.zero_grad()
-        tries_history.append(env.tries)
-        if epoch % C == 0:
+        if pigs == 0: success_rate[int(epoch/C)] += 1
+        if epoch % C == 0 and epoch != 0:
             Q_hat.load_state_dict(Q.state_dict())
-            print("epoch:", epoch, "pigs:",pigs,"tries:",tries)
+            print("epoch:", epoch, "wins:",success_rate[int(epoch/C-1)])
+            
     player.save_param(path)
-    plot_results(tries_history)
-def plot_results(tries_history):
-    plt.figure(figsize=(10, 5))
-    plt.plot(tries_history, label='Remaining Tries')
-    # הוספת ממוצע נע כדי לראות מגמת שיפור (אופציונלי)
-    if len(tries_history) > 100:
-        moving_avg = np.convolve(tries_history, np.ones(100)/100, mode='valid')
-        plt.plot(range(99, len(tries_history)), moving_avg, label='Moving Average (100)', color='red')
-    
-    plt.title('Remaining Tries per Epoch')
+    plot_results(success_rate)
+def plot_results(success_rate):
+    plt.figure(figsize=(20, 500))
+    plt.plot(success_rate, label='wins')
+    plt.title('wins per 500 Epochs')
     plt.xlabel('Epoch')
-    plt.ylabel('Tries Left')
+    plt.ylabel('Number of Wins')
     plt.legend()
     plt.grid(True)
     plt.show()

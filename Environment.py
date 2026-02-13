@@ -63,6 +63,13 @@ class Environment:
         self.rug = pygame.image.load("img/rug.png")
         self.rug = pygame.transform.scale(self.rug, (60, 60))
         self.init_level(self.level)
+
+    def calculate_ballistic_distance(self,x0, y0,action, x, y):
+        vx=(action[0].item() + 1) * 5
+        vy=(action[1].item() - 1) * (-5)
+        yp=y0+vy*(x-x0)/vx +0.5*((x-x0)**2)/vx**2
+        return y-yp
+        
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
         next_state=self.state
