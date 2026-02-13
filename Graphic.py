@@ -1,7 +1,7 @@
 import pygame
 
 WIDTH,HEIGHT=700,400
-FPS=60
+FPS=10
 BROWN=(180,130,0)
 BLACK=(0,0,0)
 class graphics:

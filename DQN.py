@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from Environment import Environment
 from State import State
 import os
+HuberLoss = nn.SmoothL1Loss()
 env=Environment()
 input_size = 133
 layer1 = 128
@@ -50,9 +51,12 @@ class DQN(nn.Module):
         new_DQN.load_state_dict(self.state_dict())
         return new_DQN
     
-    def loss (self, Q_value, rewards, Q_next_Values, Dones ):
-        Q_new = rewards + gamma * Q_next_Values * (1- Dones)
-        return MSELoss(Q_value, Q_new)
+    def loss(self, Q_value, rewards, Q_next_Values, Dones):
+        # חישוב ה-Target לפי משוואת בלמן
+        Q_new = rewards + gamma * Q_next_Values * (1 - Dones)
+        
+        # שימוש ב-Huber Loss במקום MSE
+        return HuberLoss(Q_value, Q_new)
 
     def __call__(self, states, actions):
         state_action = torch.cat((states,actions), dim=1)

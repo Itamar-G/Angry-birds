@@ -65,29 +65,40 @@ class Environment:
         self.init_level(self.level)
 
     def calculate_ballistic_distance(self,x0, y0,action, x, y):
-        vx=(action[0].item() + 1) * 5
-        vy=(action[1].item() - 1) * (-5)
+        vx=(action[0] + 1) * 5
+        vy=(action[1] - 1) * (-5)
         yp=y0+vy*(x-x0)/vx +0.5*((x-x0)**2)/vx**2
-        return y-yp
+        if abs(y-yp)<1: return 1
+        return abs(y-yp)
         
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
-        next_state=self.state
+        next_state = self.state
         done = False
-        pigs_num=len(self.pigs)
+        pigs_num_before_step = len(self.pigs) # כמות החזירים בתחילת הצעד הנוכחי
+        
         if action is not None:
             if not self.bird.move:
+                # שמירת כמות החזירים ברגע הירייה כדי לבדוק פגיעה בהמשך
+                pigs_before_shot = len(self.pigs)
+                
                 self.bird.vx = (action[0] + 1) * 5
                 self.bird.vy = (action[1] - 1) * (-5)
                 self.bird.move = True
-                self.reward-=1
+                
+                # הורדת ניקוד על עצם הירייה (כפי שהיה בקוד שלך)
+                self.reward -= 5 
                 self.tries -= 1
+                
+                for pig in list(self.pigs):
+                    self.reward += 10 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
+
         # תנועת הציפור
         if self.bird.move:
-            check=True
+            check = True
             for block in list(self.blocks):
                 if 270 < block.angle < 360:
-                    check=False
+                    check = False
             if check:
                 self.bird.Move()
 
@@ -96,10 +107,10 @@ class Environment:
 
         # התנגשויות ציפור-חזירים
         killed = pygame.sprite.groupcollide(bird_group, self.pigs, False, True, pygame.sprite.collide_mask)
+        
         # עדכון חזירים: נפילה, בדיקות קרקע וכו׳
         for pig in list(self.pigs):
             pig.stay = False
-            self.reward+=10/math.dist(self.bird.rect.midbottom, pig.rect.midbottom)
             for block in self.blocks:
                 if pygame.sprite.collide_mask(pig, block):
                     pig.stay = True
@@ -108,7 +119,8 @@ class Environment:
                 pig.Fall()
             if pig.rect.bottom >= 310:
                 pig.stay = True
-                self.reward+=10
+                self.reward += 10
+
         # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
         for block in list(self.blocks):
             block.falling = True
@@ -117,35 +129,55 @@ class Environment:
             for other in self.blocks:
                 if block is not other:
                     if pygame.sprite.collide_mask(block, other):
-                        self.reward+=2
                         if abs(block.rect.bottom - other.rect.top) < 5:
                             block.falling = False
                         if block.vy > 0 and abs(block.rect.top - other.rect.bottom) < 5:
                             other.falling = True
                             other.vy += block.vy // 2
+            
             if pygame.sprite.collide_mask(block, self.bird):
-                self.reward+=5
-                block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx*2 + 30,
+                self.reward += 2
+                block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
+                
+                # בדיקה האם הירייה הסתיימה בפגיעה בבלוק בלי לפגוע בחזיר
+                if hasattr(self, 'pigs_before_shot'):
+                    if len(self.pigs) == pigs_before_shot:
+                        self.reward -= 10 # קנס על ירייה שלא פגעה בחזיר
+                    delattr(self, 'pigs_before_shot') # מוחק את המשתנה כדי לא לקנוס שוב בפריים הבא
+
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
                 block.angle -= 1
                 block.hit += 1
+            
             if block.hit >= 2:
                 block.kill()
             if 270 < block.angle < 360:
                 block.rotate()
             block.fall()
 
-        # ציפור נופלת לקרקע — אפס
+        # ציפור נופלת לקרקע (פספוס מוחלט)
         if self.bird.rect.midbottom[1] > 400:
+            if hasattr(self, 'pigs_before_shot'):
+                if len(self.pigs) == pigs_before_shot:
+                    self.reward -= 5 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
+                delattr(self, 'pigs_before_shot')
+            
             self.bird.rect.midbottom = (45, 315)
             self.bird.move = False
-        next_state=self.state
-        self.reward+=pigs_num-len(self.pigs)*10
+
+        next_state = self.state
+        # חישוב בונוס על חזירים שנהרגו בפריים הזה
+        self.reward += (pigs_num_before_step - len(self.pigs)) * 100
+        if len(self.pigs) == 0:
+            self.reward+=200
         if self.end_of_game(): 
             done = True
-        if self.tries==0 and len(self.pigs)>0: self.reward=-50
+        
+        if self.tries == 0 and len(self.pigs) > 0: 
+            self.reward = -50
+            
         return next_state, self.reward, done
     
     def render (self):
