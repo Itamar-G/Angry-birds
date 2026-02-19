@@ -45,7 +45,6 @@ def train():
             next_state, reward, done = env.move(action)
             
             while env.bird.move:
-                env.render()
                 next_state, reward, done = env.move(None)
             
             pigs = len(env.pigs)

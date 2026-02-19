@@ -177,8 +177,9 @@ class Environment:
         
         if self.tries == 0 and len(self.pigs) > 0: 
             self.reward = -50
+        normalized_reward = max(min(self.reward, 5), -5)
             
-        return next_state, self.reward, done
+        return next_state, normalized_reward, done
     
     def render (self):
         # draw background to clear
