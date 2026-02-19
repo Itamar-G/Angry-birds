@@ -41,10 +41,11 @@ def train():
         state = env.state
         
         while not env.end_of_game() and pigs > 0 and tries > 0:
-            action = player.get_action(state, epoch=epoch)
+            action = player.get_action(state, epoch=epoch, train=True)
             next_state, reward, done = env.move(action)
             
             while env.bird.move:
+                env.render()
                 next_state, reward, done = env.move(None)
             
             pigs = len(env.pigs)
