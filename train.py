@@ -7,15 +7,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 10000
-C = 2000
+epochs = 1000000
+C = 500
 batch = 128
 learning_rate = 0.0001
 path = "Data/DQN_PARAM_Advanced_2.pth"
 
 def train():
-    state = State()
-    env = Environment(state)
+    s = State()
+    env = Environment()
+    state=s.toTensor(env)
     env.init_display()
     player = DQN_Agent(env=env)
     replay = ReplayBuffer()
@@ -38,7 +39,7 @@ def train():
         pigs = len(env.pigs)
         tries = env.tries
         print(epoch, end="\r")
-        state = env.state
+        state = env.get_state()
         
         while not env.end_of_game() and pigs > 0 and tries > 0:
             action = player.get_action(state, epoch=epoch, train=True)

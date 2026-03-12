@@ -8,17 +8,13 @@ from State import State
 import math
 
 class Environment:
-    def __init__(self,state: State = None):
+    def __init__(self):
         self.bird = Bird()
         self.pigs = pygame.sprite.Group()
         self.blocks = pygame.sprite.Group()
         self.tries = 3
         self.level = 1
         self.screen = None
-        if state:
-            self.state : State = state
-        else:
-            self.state = State()
         self.reward=0
 
     def init_pigs (self,pos):
@@ -71,9 +67,14 @@ class Environment:
         if abs(y-yp)<1: return 1
         return abs(y-yp)
         
+    def get_state(self):
+        state=State(1,1)
+        state.toTensor(self)
+
+        return state
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
-        next_state = self.state
+        next_state = self.get_state()
         done = False
         pigs_num_before_step = len(self.pigs) # כמות החזירים בתחילת הצעד הנוכחי
         
@@ -167,7 +168,7 @@ class Environment:
             self.bird.rect.midbottom = (45, 315)
             self.bird.move = False
 
-        next_state = self.state
+        next_state = self.get_state()
         # חישוב בונוס על חזירים שנהרגו בפריים הזה
         self.reward += (pigs_num_before_step - len(self.pigs)) * 100
         if len(self.pigs) == 0:
@@ -224,7 +225,7 @@ class Environment:
         # אם צריך — גם אתחול של display / screen
         # self.init_display()  # תלוי אם אתה רוצה לפתוח חלון מחדש
         # החזר וקטור מצב התחלתי  
-        return self.state
+        return self.get_state()
     def is_win(self):
         if len(self.pigs)==0: return True
         return False
