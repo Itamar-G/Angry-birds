@@ -38,17 +38,25 @@ class DQN_Agent:
         if train and rnd < epsilon:
             return random.choice(actionsx),random.choice(actionsy)
         state_tensor = state.toTensor(self.env)
-        xx, yy = torch.meshgrid(actionsx, actionsy, indexing="ij")
-        action_pairs = torch.stack([xx.flatten(), yy.flatten()], dim=1)
-        expand_state = state_tensor.unsqueeze(0).repeat(action_pairs.shape[0], 1)
+        # xx, yy = torch.meshgrid(actionsx, actionsy, indexing="ij")
+        # action_pairs = torch.stack([xx.flatten(), yy.flatten()], dim=1)
+        # expand_state = state_tensor.unsqueeze(0).repeat(action_pairs.shape[0], 1)
 
         with torch.no_grad():
-            Q_values = self.DQN(expand_state, action_pairs)
+            Q_values = self.DQN(state_tensor)
         # shape: [100]
         best_idx = torch.argmax(Q_values)
-        best_action = action_pairs[best_idx]
-        return int(best_action[0]), int(best_action[1])
+        best_action = self.index_to_action(best_idx)
+        return best_action
     
+    def index_to_action(self, index):
+        x = index // 10
+        y = index % 10
+        return x, y
+
+    def action_to_index(self, action):
+        return action[0] * 10 + action[1]
+
     def get_actions (self, states, dones):
         actions = []
         for i, state in enumerate(states):

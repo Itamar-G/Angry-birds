@@ -74,7 +74,7 @@ class Environment:
         return state
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
-        next_state = self.get_state()
+        
         done = False
         pigs_num_before_step = len(self.pigs) # כמות החזירים בתחילת הצעד הנוכחי
         
@@ -180,7 +180,7 @@ class Environment:
             self.reward = -50
         normalized_reward = max(min(self.reward, 5), -5)
             
-        return next_state, normalized_reward, done
+        return normalized_reward, done
     
     def render (self):
         # draw background to clear

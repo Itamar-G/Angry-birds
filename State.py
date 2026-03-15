@@ -4,7 +4,7 @@ import torch
 from Graphic import WIDTH, HEIGHT 
 
 class State:
-    def __init__(self, max_pigs=5, max_blocks=20):
+    def __init__(self, max_pigs=1, max_blocks=1):
         self.max_pigs = max_pigs
         self.max_blocks = max_blocks
     
@@ -12,7 +12,7 @@ class State:
         state_list = []
         
         # 1. נירמול מספר הניסיונות (נניח מקסימום 3)
-        state_list.append(env.tries / 3.0)
+        state_list.append(env.tries)
 
         # 2. Pigs state – נירמול מיקומים ביחס לרוחב וגובה המסך
         pig_list = list(env.pigs)
@@ -30,8 +30,8 @@ class State:
         block_list = list(env.blocks)
         for block in block_list[:self.max_blocks]:
             state_list += [
-                block.rect.bottomleft[0] / WIDTH,
-                block.rect.bottomleft[1] / HEIGHT,
+                block.rect.bottomleft[0] / WIDTH, # x -- bottomleft
+                block.rect.bottomleft[1] / HEIGHT,# y - bottomleft
                 block.rect.width / 100.0,   # נניח רוחב מקסימלי סביר
                 block.rect.height / 100.0,  # נניח גובה מקסימלי סביר
                 block.angle / 360.0,        # נירמול זווית ל-[0,1]

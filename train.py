@@ -14,9 +14,8 @@ learning_rate = 0.0001
 path = "Data/DQN_PARAM_Advanced_2.pth"
 
 def train():
-    s = State()
+    state = State()
     env = Environment()
-    state=s.toTensor(env)
     env.init_display()
     player = DQN_Agent(env=env)
     replay = ReplayBuffer()
@@ -39,20 +38,22 @@ def train():
         pigs = len(env.pigs)
         tries = env.tries
         print(epoch, end="\r")
-        state = env.get_state()
+        state_T=state.toTensor(env)
         
-        while not env.end_of_game() and pigs > 0 and tries > 0:
+        while not env.end_of_game() and pigs > 0 and tries > 0: # nor done:
             action = player.get_action(state, epoch=epoch, train=True)
-            next_state, reward, done = env.move(action)
+            env.move(action)
             
             while env.bird.move:
-                next_state, reward, done = env.move(None)
+                reward, done = env.move(None)
+            
+            next_state_T = state.toTensor(env)
             
             pigs = len(env.pigs)
             tries = env.tries
             
-            replay.push(env, state, action, reward, next_state, env.end_of_game())
-            state = next_state
+            replay.push(state_T, action, reward, next_state_T, done)
+            state_T = next_state_T.clone()
             
             if epoch < 500:
                 continue

@@ -9,10 +9,10 @@ from State import State
 import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
-input_size = 133
+input_size = 9
 layer1 = 128
-layer2 = 64
-output_size = 1
+layer2 = 128
+output_size = 100
 gamma = 0.99 
 MSELoss = nn.MSELoss()
 class DQN(nn.Module):
@@ -58,6 +58,5 @@ class DQN(nn.Module):
         # שימוש ב-Huber Loss במקום MSE
         return HuberLoss(Q_value, Q_new)
 
-    def __call__(self, states, actions):
-        state_action = torch.cat((states,actions), dim=1)
-        return self.forward(state_action)
+    def __call__(self, states, actions=None):
+        return self.forward(states)

@@ -9,24 +9,13 @@ class ReplayBuffer:
     def __init__(self, capacity=10000) -> None:
         self.buffer = deque(maxlen=capacity)
 
-    def push(self, env, state, action, reward, next_state, done):
-        # המרה לטנזור בעזרת הפונקציה שכבר כתבת ב-State
-        if hasattr(state, 'toTensor'):
-            s_tensor = state.toTensor(env)
-        else:
-            s_tensor = torch.tensor(state, dtype=torch.float32)
-
-        if hasattr(next_state, 'toTensor'):
-            ns_tensor = next_state.toTensor(env)
-        else:
-            ns_tensor = torch.tensor(next_state, dtype=torch.float32)
-
+    def push(self, state_T, action, reward, next_state_T, done):
         # יצירת טנזורים לשאר הערכים
         action_tensor = torch.tensor(action, dtype=torch.float32)
         reward_tensor = torch.tensor(reward, dtype=torch.float32).reshape(1)
         done_tensor = torch.tensor(done, dtype=torch.float32).reshape(1)
-
-        self.buffer.append((s_tensor, action_tensor, reward_tensor, ns_tensor, done_tensor))
+        self.buffer.append((state_T, action_tensor, reward_tensor, next_state_T, done_tensor))
+    
     def push_tensors (self, state_tensor, action_tensor, reward_tensor, next_state_tensor, done):
         self.buffer.append((state_tensor, action_tensor, reward_tensor, next_state_tensor, done))
             
