@@ -39,8 +39,8 @@ def train():
         tries = env.tries
         print(epoch, end="\r")
         state_T=state.toTensor(env)
-        
-        while not env.end_of_game() and pigs > 0 and tries > 0: # nor done:
+        done = False
+        while not done: # nor done:
             action = player.get_action(state, epoch=epoch, train=True)
             env.move(action)
             

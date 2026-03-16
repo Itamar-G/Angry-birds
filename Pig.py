@@ -19,3 +19,6 @@ class Pig(pygame.sprite.Sprite):
         y += self.vy
         self.rect.midbottom=x,y
         self.vy+=1
+        if y > 1000: 
+            self.vy = 0
+            self.rect.midbottom = (x, 1000)

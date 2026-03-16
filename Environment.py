@@ -175,7 +175,7 @@ class Environment:
                 block.kill()    
                     
         # ציפור נופלת לקרקע (פספוס מוחלט)
-        if self.bird.rect.midbottom[1] > 400:
+        if self.bird.rect.midbottom[1] > 400 or self.bird.rect.midbottom[0] > 700:
             if hasattr(self, 'pigs_before_shot'):
                 if len(self.pigs) == pigs_before_shot:
                     self.reward -= 5 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
