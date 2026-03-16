@@ -5,6 +5,7 @@ from Graphic import *
 import torch
 from Human_agent import Human_agent
 from ai_agent import DQN_Agent
+from State import State
 PATH = "Data/DQN_PARAM_Advanced_2.pth"
 
 def show_game_over(screen):
@@ -20,25 +21,29 @@ def show_game_over(screen):
 
 def main():
     env = Environment()
+    state=State()
     env.init_display()
     #player = Human_agent()
-    player = DQN_Agent(parametes_path=PATH)
+    player = DQN_Agent(parametes_path=PATH, env=env) # הוספת ה-env כאן
     run = True
 
     while run:
         pygame.event.pump()
         events = pygame.event.get()
-        for event in events:
-            
-            if event.type == pygame.QUIT:
-                run = False
-
-        if not env.bird.move:
-            action = player.get_action(env.state)
-
+        
+        # 1. קודם כל נותנים לפיזיקה לרוץ (נפילת חזירים/בלוקים בתחילת שלב)
         env.render()
-        env.move(action)
+        env.move(None) # מריץ עדכון פיזיקלי בלי ירייה
 
+        # 2. רק אם הציפור לא בתנועה והסביבה התייצבה - הסוכן מקבל החלטה
+        # בתוך main.py
+        if not env.bird.move and env.is_stable() and env.tries > 0:
+            state_obj = env.get_state()
+            # אפשר להעביר את ה-env כאן אם לא הגדרת אותו ב-init
+            action = player.get_action(state_obj, train=False) 
+            env.move(action)
+            
+        # בדיקת סוף משחק
         if env.end_of_game():
             run = False
 

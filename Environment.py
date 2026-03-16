@@ -122,42 +122,58 @@ class Environment:
                 pig.stay = True
                 self.reward += 10
 
-        # עדכון בלוקים: נפילה, התנגשות, סיבוב/הריסה
-        for block in list(self.blocks):
+        # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
+        
+        # שלב א': נמיין את הבלוקים מלמטה למעלה (לפי Y) כדי שנוכל לבדוק יציבות מהקרקע מעלה
+        sorted_blocks = sorted(list(self.blocks), key=lambda b: b.rect.bottom, reverse=True)
+        
+        for block in sorted_blocks:
+            # נניח בתחילה שהבלוק נופל
             block.falling = True
-            if block.rect.bottom >= 310:
-                block.falling = False
-            for other in self.blocks:
-                if block is not other:
-                    if pygame.sprite.collide_mask(block, other):
-                        if abs(block.rect.bottom - other.rect.top) < 5:
-                            block.falling = False
-                        if block.vy > 0 and abs(block.rect.top - other.rect.bottom) < 5:
-                            other.falling = True
-                            other.vy += block.vy // 2
             
+            # אם הבלוק על הרצפה - הוא יציב
+            if block.rect.bottom >= 360:
+                block.rect.bottom = 360 # הצמדה לרצפה
+                block.falling = False
+            else:
+                # אם הוא לא על הרצפה, נבדוק אם הוא יושב על בלוק אחר שכבר קבענו שהוא לא נופל
+                for other in sorted_blocks:
+                    if block is other or other.falling:
+                        continue # אי אפשר להישען על בלוק שבעצמו נופל
+                    
+                    # בדיקה אם התחתית של הבלוק הנוכחי נוגעת בחלק העליון של הבלוק השני
+                    if pygame.sprite.collide_mask(block, other):
+                        # בדיקה שהבלוק מעל השני (עם טווח טעות קטן)
+                        if abs(block.rect.bottom - other.rect.top) < 10:
+                            block.falling = False
+                            # הצמדה מדויקת כדי למנוע "רעידות"
+                            block.rect.bottom = other.rect.top
+                            break
+
+            # הרצת הנפילה/סיבוב הפיזיקלי
+            if block.falling:
+                block.fall()
+            else:
+                block.vy = 0 # איפוס מהירות אם הוא יציב
+
+            # טיפול בהתנגשות עם הציפור (נשאר דומה)
             if pygame.sprite.collide_mask(block, self.bird):
                 self.reward += 2
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
-                
-                # בדיקה האם הירייה הסתיימה בפגיעה בבלוק בלי לפגוע בחזיר
-                if hasattr(self, 'pigs_before_shot'):
-                    if len(self.pigs) == pigs_before_shot:
-                        self.reward -= 10 # קנס על ירייה שלא פגעה בחזיר
-                    delattr(self, 'pigs_before_shot') # מוחק את המשתנה כדי לא לקנוס שוב בפריים הבא
-
+                # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
+                block.angle -= 1 
+                block.hit += 1
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
-                block.angle -= 1
-                block.hit += 1
-            
-            if block.hit >= 2:
-                block.kill()
+
+            # סיבוב בלוקים פגועים
             if 270 < block.angle < 360:
                 block.rotate()
-            block.fall()
-
+            
+            if block.hit >= 2:
+                block.kill()    
+                    
         # ציפור נופלת לקרקע (פספוס מוחלט)
         if self.bird.rect.midbottom[1] > 400:
             if hasattr(self, 'pigs_before_shot'):
@@ -181,6 +197,20 @@ class Environment:
         normalized_reward = max(min(self.reward, 5), -5)
             
         return normalized_reward, done
+    
+    def is_stable(self):
+        # בדיקה אם הציפור בתנועה
+        if self.bird.move:
+            return False
+        # בדיקה אם יש חזיר שנופל
+        for pig in self.pigs:
+            if not pig.stay:
+                return False
+        # בדיקה אם יש בלוק שנופל או מסתובב
+        for block in self.blocks:
+            if block.falling or (block.angle < 360 and block.angle > 270):
+                return False
+        return True
     
     def render (self):
         # draw background to clear

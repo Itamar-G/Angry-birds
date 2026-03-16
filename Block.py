@@ -33,8 +33,8 @@ class Block(pygame.sprite.Sprite):
     def fall(self):
         if self.falling:
             x, y = self.rect.midbottom
+            self.vy += 1 # כוח כבידה
             y += self.vy
             self.rect.midbottom = (x, y)
-            self.vy += 1
         else:
-            self.vy = 0
+            self.vy = 0 # חשוב לאפס מהירות כשהבלוק נעצר
