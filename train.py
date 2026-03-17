@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 5000
+epochs = 100000
 C = 500
 batch = 128
 learning_rate = 0.0001
@@ -44,7 +44,7 @@ def train():
             action = player.get_action(state, epoch=epoch, train=True)
             env.move(action)
             
-            while env.bird.move:
+            while env.bird.move or not env.is_stable():
                 reward, done = env.move(None)
             
             next_state_T = state.toTensor(env)
