@@ -126,7 +126,7 @@ class Environment:
                     break
             if not pig.stay:
                 pig.Fall()
-            if pig.rect.bottom >= 310:
+            if pig.rect.bottom >= 360:
                 pig.stay = True
                 pig.kill()
                 self.reward += 10
