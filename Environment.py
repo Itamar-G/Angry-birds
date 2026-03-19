@@ -32,23 +32,31 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = 1#random.randint(2, 4)
+        num_buildings = 1
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
-            num_floors = 2#random.randint(2, 4)
+            num_floors = 1
+            
+            # משתנה שיעזור לנו לדעת מה הגובה המצטבר של המבנה
+            current_top_y = 360 
 
             for i in range(num_floors):
-                is_horizontal = random.random() < 0.3  # 30% מהבלוקים יהיו שוכבים
+                is_horizontal = random.random() < 0.3
                 width = 60 if is_horizontal else 20
                 height = 20 if is_horizontal else 60
-                y = 360 - (i * height)
-                block = Block((x, y), width=width, height=height)
+                
+                # מיקום הבלוק: התחתית שלו היא ה-top של הקומה הקודמת
+                block = Block((x, current_top_y), width=width, height=height)
                 self.blocks.add(block)
+                
+                # עדכון הגובה לקומה הבאה
+                current_top_y -= height
 
-            # שים חזיר על הקומה העליונה
-            top_y = 310 - (num_floors * (20 if is_horizontal else 60)) - 40
-            self.init_pigs((x, top_y))
+            # מיקום החזיר: בדיוק על הגג של הקומה האחרונה
+            # current_top_y כרגע מייצג את ה-top של הבלוק העליון ביותר
+            self.init_pigs((x, current_top_y))
+
     def init_display(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -120,6 +128,7 @@ class Environment:
                 pig.Fall()
             if pig.rect.bottom >= 310:
                 pig.stay = True
+                pig.kill()
                 self.reward += 10
 
         # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
