@@ -46,7 +46,7 @@ def train():
             
             while env.bird.move or not env.is_stable():
                 reward, done = env.move(None)
-                env.render()
+                #env.render()
             next_state_T = state.toTensor(env)
             
             pigs = len(env.pigs)
