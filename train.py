@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 100000
+epochs = 10000
 C = 500
 batch = 128
 learning_rate = 0.0001

@@ -23,8 +23,8 @@ def main():
     env = Environment()
     state=State()
     env.init_display()
-    player = Human_agent()
-    #player = DQN_Agent(parametes_path=PATH, env=env) # הוספת ה-env כאן
+    #player = Human_agent()
+    player = DQN_Agent(parametes_path=PATH, env=env) # הוספת ה-env כאן
     run = True
 
     while run:
@@ -40,8 +40,8 @@ def main():
         if not env.bird.move and env.is_stable() and env.tries > 0:
             state_obj = env.get_state()
             # אפשר להעביר את ה-env כאן אם לא הגדרת אותו ב-init
-            action = player.get_action((45, 315),events)
-            #action = player.get_action(state_obj, train=False) 
+            #action = player.get_action((45, 315),events)
+            action = player.get_action(state_obj, train=False) 
             env.move(action)
             
         # בדיקת סוף משחק
