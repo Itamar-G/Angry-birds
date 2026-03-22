@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 10000
+epochs = 100000
 C = 500
 batch = 128
 learning_rate = 0.0001
-path = "Data/DQN_PARAM_Advanced_2.pth"
+path = "Data/DQN_PARAM_Advanced_3.pth"
 
 def train():
     state = State()
@@ -46,7 +46,7 @@ def train():
             
             while env.bird.move or not env.is_stable():
                 reward, done = env.move(None)
-                #env.render()
+                env.render()
             next_state_T = state.toTensor(env)
             
             pigs = len(env.pigs)

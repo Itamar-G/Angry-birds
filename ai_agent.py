@@ -9,7 +9,7 @@ from State import State
 
 epsilon_start = 1
 epsilon_final = 0.01
-epsiln_decay = 5000
+epsiln_decay = 50000
 
 # epochs = 1000
 # batch_size = 64
