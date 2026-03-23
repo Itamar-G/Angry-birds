@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 10000
+epochs = 2501
 C = 500
 batch = 128
 learning_rate = 0.0001
@@ -41,7 +41,7 @@ def train():
         state_T=state.toTensor(env)
         done = False
         while not done: # nor done:
-            action = player.get_action(state, epoch=epoch, train=True)
+            action = player.get_action(state_T, epoch=epoch, train=True)
             env.move(action)
             
             while env.bird.move or not env.is_stable():
@@ -60,7 +60,7 @@ def train():
                 
             states, actions, rewards, next_states, dones = replay.sample(batch)
             Q_values = Q(states, actions)
-            next_actions = player.get_actions(next_states, dones)
+            next_actions = player.get_actions(next_states, dones, train=False)
             
             with torch.no_grad():
                 Q_hat_Values = Q_hat(next_states, next_actions)

@@ -30,20 +30,19 @@ class DQN_Agent:
           else:
               self.DQN.eval()
 
-    def get_action (self, state: State, epoch = 0, events= None, train = True):
+    def get_action (self, state_T, epoch = 0, events= None, train = True):
         epsilon = self.epsilon_greedy(epoch)
         rnd = random.random()
         actionsx = torch.arange(10)
         actionsy = torch.arange(10)
         if train and rnd < epsilon:
             return random.choice(actionsx),random.choice(actionsy)
-        state_tensor = state.toTensor(self.env)
         # xx, yy = torch.meshgrid(actionsx, actionsy, indexing="ij")
         # action_pairs = torch.stack([xx.flatten(), yy.flatten()], dim=1)
         # expand_state = state_tensor.unsqueeze(0).repeat(action_pairs.shape[0], 1)
 
         with torch.no_grad():
-            Q_values = self.DQN(state_tensor)
+            Q_values = self.DQN(state_T)
         # shape: [100]
         best_idx = torch.argmax(Q_values)
         best_action = self.index_to_action(best_idx)
@@ -57,10 +56,10 @@ class DQN_Agent:
     def action_to_index(self, action):
         return action[0] * 10 + action[1]
 
-    def get_actions (self, states, dones):
+    def get_actions (self, states, dones, train = True):
         actions = []
         for i, state in enumerate(states):
-            actions.append(self.get_action(State.tensor_to_state_list(state), train=True)) #SARSA = True / Q-learning = False
+            actions.append(self.get_action(state, train=train)) #SARSA = True / Q-learning = False
         return torch.tensor(actions)
 
     def epsilon_greedy(self,epoch, start = epsilon_start, final=epsilon_final, decay=epsiln_decay):
