@@ -7,10 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 2501
+epochs = 10001
 C = 500
 batch = 128
-learning_rate = 0.0001
 path = "Data/DQN_PARAM_Advanced_5.pth"
 
 def train():
@@ -22,7 +21,7 @@ def train():
     Q = player.DQN
     Q_hat: DQN = Q.copy()
     Q_hat.train = False
-    optim = torch.optim.Adam(Q.parameters(), lr=0.0001)
+    optim = torch.optim.Adam(Q.parameters(), lr=0.00001)
     
     success_rate = []
     # --- הוספה: רשימות למעקב אחר loss ---
@@ -60,7 +59,7 @@ def train():
                 
             states, actions, rewards, next_states, dones = replay.sample(batch)
             Q_values = Q(states, actions)
-            next_actions = player.get_actions(next_states, dones, train=False)
+            next_actions = player.get_actions(next_states, dones, train=True)
             
             with torch.no_grad():
                 Q_hat_Values = Q_hat(next_states, next_actions)
