@@ -5,11 +5,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from Environment import Environment
-from State import State
+from State import *
 import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
-input_size = 131
+input_size = 1 + 2*max_pigs + 6*max_blocks
 layer1 = 128
 layer2 = 128
 output_size = 100

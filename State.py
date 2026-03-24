@@ -3,8 +3,10 @@ import torch
 # ייבוא הממדים לצורך נירמול
 from Graphic import WIDTH, HEIGHT 
 
+max_pigs = 3
+max_blocks = 5
 class State:
-    def __init__(self, max_pigs=5, max_blocks=20):
+    def __init__(self, max_pigs=max_pigs, max_blocks=max_blocks):
         self.max_pigs = max_pigs
         self.max_blocks = max_blocks
     
