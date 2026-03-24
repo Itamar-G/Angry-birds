@@ -9,7 +9,7 @@ from State import State
 import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
-input_size = 9
+input_size = 131
 layer1 = 128
 layer2 = 128
 output_size = 100

@@ -10,7 +10,7 @@ import torch
 epochs = 10001
 C = 500
 batch = 128
-path = "Data/DQN_PARAM_Advanced_6.pth"
+path = "Data/DQN_PARAM_Advanced_7.pth"
 
 def train():
     state = State()

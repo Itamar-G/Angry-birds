@@ -16,6 +16,7 @@ class Environment:
         self.level = 1
         self.screen = None
         self.reward=0
+        self.steps_since_shot = 0
 
     def init_pigs (self,pos):
         pig=Pig(pos)
@@ -32,11 +33,11 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = 1
+        num_buildings = random.randint(1, 3) 
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
-            num_floors = 1
+            num_floors = random.randint(1, 2)
             
             # משתנה שיעזור לנו לדעת מה הגובה המצטבר של המבנה
             current_top_y = 360 
@@ -76,10 +77,20 @@ class Environment:
         return abs(y-yp)
         
     def get_state(self):
-        state=State(1,1)
+        state=State()
         state.toTensor(self)
-
         return state
+    def force_stabilize_blocks(self):
+        for block in self.blocks:
+            # מציאת הזווית הקרובה ביותר בקפיצות של 90 מעלות
+            current_angle = block.angle % 360
+            snapped_angle = round(current_angle / 90) * 90
+            block.angle = snapped_angle
+            
+            # איפוס מהירויות פיזיקליות
+            block.vy = 0
+            block.falling = False
+
     def move(self, action):
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
         
@@ -97,7 +108,7 @@ class Environment:
                 
                 # הורדת ניקוד על עצם הירייה (כפי שהיה בקוד שלך)
                 self.reward -= 1 
-                self.tries -= 2
+                self.tries -= 1
                 
                 for pig in list(self.pigs):
                     self.reward += 3 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
@@ -182,7 +193,15 @@ class Environment:
             
             if block.hit >= 2:
                 block.kill()    
-                    
+
+        if not self.is_stable():
+            self.steps_since_shot += 1
+        # בדיקה אם עבר יותר מדי זמן ללא התייצבות
+        if self.steps_since_shot > 100:
+            self.force_stabilize_blocks()
+            self.bird.move = False
+            self.bird.rect.midbottom = (45, 315)
+            self.steps_since_shot = 0        
         # ציפור נופלת לקרקע (פספוס מוחלט)
         if self.bird.rect.midbottom[1] > 400 or self.bird.rect.midbottom[0] > 700:
             if hasattr(self, 'pigs_before_shot'):

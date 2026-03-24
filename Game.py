@@ -23,8 +23,8 @@ def main():
     env = Environment()
     state=State()
     env.init_display()
-    #player = Human_agent()
-    player = DQN_Agent(parametes_path=PATH, env=env) # הוספת ה-env כאן
+    player = Human_agent()
+    #player = DQN_Agent(parametes_path=PATH, env=env) # הוספת ה-env כאן
     run = True
 
     while run:
@@ -41,8 +41,8 @@ def main():
             state=State()
             state_T=state.toTensor(env)
             # אפשר להעביר את ה-env כאן אם לא הגדרת אותו ב-init
-            #action = player.get_action((45, 315),events)
-            action = player.get_action(state_T, train=False) 
+            action = player.get_action((45, 315),events)
+            #action = player.get_action(state_T, train=False) 
             env.move(action)
             
         # בדיקת סוף משחק
