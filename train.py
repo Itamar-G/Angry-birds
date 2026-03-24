@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 10001
+epochs = 1000001
 C = 500
 batch = 128
-path = "Data/DQN_PARAM_Advanced_5.pth"
+path = "Data/DQN_PARAM_Advanced_6.pth"
 
 def train():
     state = State()
@@ -28,7 +28,7 @@ def train():
     loss_history = []
     current_epoch_losses = [] 
     # -----------------------------------
-
+    good = False
     for epoch in range(epochs):
         if epoch % C == 0: 
             success_rate.append(0)
@@ -90,8 +90,11 @@ def train():
                 loss_history.append(0)
             
             print("epoch:", epoch, "wins:", success_rate[int(epoch/C-1)], "avg loss:", loss_history[-1])
-            
-    player.save_param(path)
+            if success_rate[int(epoch/C-1)] >0.95*C:
+                player.save_param(path)
+                good = True
+    if not good:    
+        player.save_param(path)
     # עדכון הקריאה לפונקציית הציור
     plot_results(success_rate, loss_history)
 
