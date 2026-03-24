@@ -96,11 +96,11 @@ class Environment:
                 self.bird.move = True
                 
                 # הורדת ניקוד על עצם הירייה (כפי שהיה בקוד שלך)
-                self.reward -= 5 
-                self.tries -= 1
+                self.reward -= 1 
+                self.tries -= 2
                 
                 for pig in list(self.pigs):
-                    self.reward += 10 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
+                    self.reward += 3 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
 
         # תנועת הציפור
         if self.bird.move:
@@ -129,7 +129,7 @@ class Environment:
             if pig.rect.bottom >= 360:
                 pig.stay = True
                 pig.kill()
-                self.reward += 10
+                self.reward += 20
 
         # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
         
@@ -167,7 +167,7 @@ class Environment:
 
             # טיפול בהתנגשות עם הציפור (נשאר דומה)
             if pygame.sprite.collide_mask(block, self.bird):
-                self.reward += 2
+                self.reward += 3
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
                 # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
@@ -187,7 +187,7 @@ class Environment:
         if self.bird.rect.midbottom[1] > 400 or self.bird.rect.midbottom[0] > 700:
             if hasattr(self, 'pigs_before_shot'):
                 if len(self.pigs) == pigs_before_shot:
-                    self.reward -= 5 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
+                    self.reward -= 20 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
                 delattr(self, 'pigs_before_shot')
             
             self.bird.rect.midbottom = (45, 315)
@@ -195,16 +195,14 @@ class Environment:
 
         next_state = self.get_state()
         # חישוב בונוס על חזירים שנהרגו בפריים הזה
-        self.reward += (pigs_num_before_step - len(self.pigs)) * 100
+        self.reward += (pigs_num_before_step - len(self.pigs)) * 20
         if len(self.pigs) == 0:
-            self.reward+=200
+            self.reward+=50
         if self.end_of_game(): 
             done = True
-        
         if self.tries == 0 and len(self.pigs) > 0: 
             self.reward = -50
-        normalized_reward = max(min(self.reward, 5), -5)
-            
+        normalized_reward = max(min(self.reward, 5), -5)     
         return normalized_reward, done
     
     def is_stable(self):
