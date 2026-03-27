@@ -33,11 +33,11 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = random.randint(1, 3) 
+        num_buildings = 2
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
-            num_floors = random.randint(1, 2)
+            num_floors = 1
             
             # משתנה שיעזור לנו לדעת מה הגובה המצטבר של המבנה
             current_top_y = 360 
@@ -111,7 +111,7 @@ class Environment:
                 self.tries -= 1
                 
                 for pig in list(self.pigs):
-                    self.reward += 3 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
+                    self.reward += 2 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
 
         # תנועת הציפור
         if self.bird.move:
@@ -140,7 +140,7 @@ class Environment:
             if pig.rect.bottom >= 360:
                 pig.stay = True
                 pig.kill()
-                self.reward += 20
+                self.reward += 50
 
         # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
         
@@ -178,7 +178,9 @@ class Environment:
 
             # טיפול בהתנגשות עם הציפור (נשאר דומה)
             if pygame.sprite.collide_mask(block, self.bird):
-                self.reward += 3
+                for pig in list(self.pigs):
+                    if pygame.sprite.collide_mask(block, pig):
+                        self.reward += 3
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
                 # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
@@ -214,13 +216,13 @@ class Environment:
 
         next_state = self.get_state()
         # חישוב בונוס על חזירים שנהרגו בפריים הזה
-        self.reward += (pigs_num_before_step - len(self.pigs)) * 20
+        self.reward += (pigs_num_before_step - len(self.pigs)) * 100
         if len(self.pigs) == 0:
-            self.reward+=50
+            self.reward+=300
         if self.end_of_game(): 
             done = True
         if self.tries == 0 and len(self.pigs) > 0: 
-            self.reward = -50
+            self.reward = -300
         normalized_reward = max(min(self.reward, 5), -5)     
         return normalized_reward, done
     

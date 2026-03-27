@@ -9,7 +9,7 @@ from State import State
 
 epsilon_start = 1
 epsilon_final = 0.01
-epsiln_decay = 50000#ככל שמגדילים, יש יותר זמן אקראי
+epsiln_decay = 200000#ככל שמגדילים, יש יותר זמן אקראי
 
 # epochs = 1000
 # batch_size = 64
