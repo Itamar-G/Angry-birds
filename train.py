@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 500001
+epochs = 1000001
 C = 500
 batch = 128
 path = "Data/DQN_PARAM_Advanced_7.pth"
