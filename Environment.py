@@ -102,7 +102,7 @@ class Environment:
                 # שמירת כמות החזירים ברגע הירייה כדי לבדוק פגיעה בהמשך
                 pigs_before_shot = len(self.pigs)
                 
-                self.bird.vx = (action[0] + 1) * 5
+                self.bird.vx = (action[0] + 1) * 3
                 self.bird.vy = (action[1] - 1) * (-5)
                 self.bird.move = True
                 
@@ -217,10 +217,10 @@ class Environment:
         next_state = self.get_state()
         # חישוב בונוס על חזירים שנהרגו בפריים הזה
         self.reward += (pigs_num_before_step - len(self.pigs)) * 100
-        if len(self.pigs) == 0:
-            self.reward+=300
         if self.end_of_game(): 
             done = True
+        if done and len(self.pigs) == 0:
+            self.reward += 200 + (self.tries * 50) # בונוס על יריות שנשארו
         if self.tries == 0 and len(self.pigs) > 0: 
             self.reward = -300
         normalized_reward = max(min(self.reward, 5), -5)     

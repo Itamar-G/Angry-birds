@@ -9,31 +9,28 @@ from State import *
 import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
-input_size = 1 + 2*max_pigs + 6*max_blocks
-layer1 = 128
-layer2 = 128
+input_size = 1 + 2*max_pigs + 6*max_blocks # וודא ש-max_blocks מעודכן ל-2 לפחות
+layer1 = 256  # הגדלה מ-128
+layer2 = 256
+layer3 = 128  # הוספת שכבה נוספת
 output_size = 100
-gamma = 0.99 
-MSELoss = nn.MSELoss()
+gamma = 0.99
+
 class DQN(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        if torch.cuda.is_available:
-            self.device = torch.device('cpu') # 'cuda'
-        else:
-            self.device = torch.device('cpu')
+        self.net = nn.Sequential(
+            nn.Linear(input_size, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, output_size)
+        )
         
-        self.linear1 = nn.Linear(input_size, layer1)
-        self.linear2 = nn.Linear(layer1, layer2)
-        self.output = nn.Linear(layer2, output_size)
-        
-    def forward (self, x):
-        x = self.linear1(x)
-        x = F.relu(x)
-        x = self.linear2(x)
-        x = F.relu(x)
-        x = self.output(x)
-        return x
+    def forward(self, x):
+        return self.net(x)
     
     def load_params(self, path):
         self.load_state_dict(torch.load(path))

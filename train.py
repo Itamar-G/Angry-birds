@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 1000001
+epochs = 100001
 C = 500
 batch = 128
-path = "Data/DQN_PARAM_Advanced_7.pth"
+path = "Data/DQN_PARAM_2BUILDINGS_1.pth"
 
 def train():
     state = State()
@@ -58,7 +58,8 @@ def train():
                 continue
                 
             states, actions, rewards, next_states, dones = replay.sample(batch)
-            Q_values = Q(states, actions)
+            indices = (actions[:, 0] * 10 + actions[:, 1]).long().unsqueeze(1)
+            Q_values = Q(states).gather(1, indices)
             next_actions = player.get_actions(next_states, dones, train=True)
             
             with torch.no_grad():
