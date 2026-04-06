@@ -10,9 +10,6 @@ import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
 input_size = 1 + 2*max_pigs + 6*max_blocks # וודא ש-max_blocks מעודכן ל-2 לפחות
-layer1 = 256  # הגדלה מ-128
-layer2 = 256
-layer3 = 128  # הוספת שכבה נוספת
 output_size = 100
 gamma = 0.99
 

@@ -1,4 +1,4 @@
-from DQN import DQN
+from DQN import DQN, HuberLoss
 from ai_agent import DQN_Agent
 from Environment import Environment
 from ReplayBuffer import ReplayBuffer
@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 100001
+epochs = 1000001
 C = 500
 batch = 128
-path = "Data/DQN_PARAM_2BUILDINGS_1.pth"
+gamma = 0.99
+path = "Data/DQN_PARAM_Advanced_8.pth"
 
 def train():
     state = State()
@@ -63,10 +64,13 @@ def train():
             next_actions = player.get_actions(next_states, dones, train=True)
             
             with torch.no_grad():
-                Q_hat_Values = Q_hat(next_states, next_actions)
-            
-            loss = Q.loss(Q_values, rewards, Q_hat_Values, dones)
-            
+                # במקום get_actions, אנחנו לוקחים את הערך המקסימלי שהרשת חוזה למצב הבא
+                Q_hat_Values = Q_hat(next_states).max(1)[0].unsqueeze(1)
+                # חישוב ה-Target לפי משוואת בלמן
+                target_Q = rewards + (gamma * Q_hat_Values * (1 - dones))
+
+            # חישוב ה-Loss בין הערכים הנוכחיים ל-Target
+            loss = HuberLoss(Q_values, target_Q)
             # --- הוספה: שמירת ערך ה-loss הנוכחי ---
             current_epoch_losses.append(loss.item())
             # ------------------------------------

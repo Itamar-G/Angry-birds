@@ -33,11 +33,11 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = 2
+        num_buildings = random.randint(1, 3)  
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
-            num_floors = 1
+            num_floors = random.randint(1, 3)
             
             # משתנה שיעזור לנו לדעת מה הגובה המצטבר של המבנה
             current_top_y = 360 
@@ -180,7 +180,7 @@ class Environment:
             if pygame.sprite.collide_mask(block, self.bird):
                 for pig in list(self.pigs):
                     if pygame.sprite.collide_mask(block, pig):
-                        self.reward += 3
+                        self.reward += 7
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
                 # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
@@ -188,6 +188,7 @@ class Environment:
                 block.hit += 1
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
+                self.reward+=3
 
             # סיבוב בלוקים פגועים
             if 270 < block.angle < 360:
