@@ -73,7 +73,6 @@ class Environment:
         vx=(action[0] + 1) * 5
         vy=(action[1] - 1) * (-5)
         yp=y0+vy*(x-x0)/vx +0.5*((x-x0)**2)/vx**2
-        if abs(y-yp)<1: return 1
         return abs(y-yp)
         
     def get_state(self):
@@ -95,7 +94,6 @@ class Environment:
         # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
         
         done = False
-        pigs_num_before_step = len(self.pigs) # כמות החזירים בתחילת הצעד הנוכחי
         
         if action is not None:
             if not self.bird.move:
@@ -111,7 +109,7 @@ class Environment:
                 self.tries -= 1
                 
                 for pig in list(self.pigs):
-                    self.reward += 2 / self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
+                    self.reward += 10 - 0.2 * self.calculate_ballistic_distance(45, 315, action, pig.rect.midbottom[0], pig.rect.midbottom[1])
 
         # תנועת הציפור
         if self.bird.move:
@@ -122,15 +120,14 @@ class Environment:
             if check:
                 self.bird.Move()
 
-        # גיבוש קבוצות sprites לציפור / חזירים
-        bird_group = pygame.sprite.GroupSingle(self.bird)
-
         # התנגשויות ציפור-חזירים
-        killed = pygame.sprite.groupcollide(bird_group, self.pigs, False, True, pygame.sprite.collide_mask)
         
         # עדכון חזירים: נפילה, בדיקות קרקע וכו׳
         for pig in list(self.pigs):
             pig.stay = False
+            if pygame.sprite.collide_mask(pig, self.bird):
+                self.reward += 15
+                pig.kill()
             for block in self.blocks:
                 if pygame.sprite.collide_mask(pig, block):
                     pig.stay = True
@@ -140,7 +137,7 @@ class Environment:
             if pig.rect.bottom >= 360:
                 pig.stay = True
                 pig.kill()
-                self.reward += 50
+                self.reward += 10
 
         # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
         
@@ -180,7 +177,7 @@ class Environment:
             if pygame.sprite.collide_mask(block, self.bird):
                 for pig in list(self.pigs):
                     if pygame.sprite.collide_mask(block, pig):
-                        self.reward += 7
+                        self.reward += 4
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
                 # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
@@ -188,7 +185,7 @@ class Environment:
                 block.hit += 1
                 self.bird.rect.midbottom = (45, 315)
                 self.bird.move = False
-                self.reward+=3
+                self.reward+=1
 
             # סיבוב בלוקים פגועים
             if 270 < block.angle < 360:
@@ -209,23 +206,20 @@ class Environment:
         if self.bird.rect.midbottom[1] > 400 or self.bird.rect.midbottom[0] > 700:
             if hasattr(self, 'pigs_before_shot'):
                 if len(self.pigs) == pigs_before_shot:
-                    self.reward -= 20 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
+                    self.reward -= 15 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
                 delattr(self, 'pigs_before_shot')
             
             self.bird.rect.midbottom = (45, 315)
             self.bird.move = False
 
-        next_state = self.get_state()
-        # חישוב בונוס על חזירים שנהרגו בפריים הזה
-        self.reward += (pigs_num_before_step - len(self.pigs)) * 100
         if self.end_of_game(): 
             done = True
         if done and len(self.pigs) == 0:
-            self.reward += 200 + (self.tries * 50) # בונוס על יריות שנשארו
+            self.reward += 20 + (self.tries * 5) # בונוס על יריות שנשארו
         if self.tries == 0 and len(self.pigs) > 0: 
-            self.reward = -300
-        normalized_reward = max(min(self.reward, 5), -5)     
-        return normalized_reward, done
+            self.reward = -30
+        self.reward = self.reward/30  
+        return self.reward, done
     
     def is_stable(self):
         # בדיקה אם הציפור בתנועה

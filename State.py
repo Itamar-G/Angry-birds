@@ -20,10 +20,9 @@ class State:
         pig_list = list(env.pigs)
         for pig in pig_list[:self.max_pigs]:
             state_list += [
-                pig.rect.centerx / WIDTH,
-                pig.rect.centery / HEIGHT
+                (pig.rect.centerx-env.bird.rect.midbottom[0])/ WIDTH,
+                (pig.rect.centery-env.bird.rect.midbottom[1])/ HEIGHT
             ]
-
         # Fill remaining pigs
         for _ in range(self.max_pigs - len(pig_list)):
             state_list += [0.0, 0.0]
@@ -32,8 +31,8 @@ class State:
         block_list = list(env.blocks)
         for block in block_list[:self.max_blocks]:
             state_list += [
-                block.rect.bottomleft[0] / WIDTH, # x -- bottomleft
-                block.rect.bottomleft[1] / HEIGHT,# y - bottomleft
+                (block.rect.bottomleft[0] - env.bird.rect.midbottom[0]) / WIDTH, # x -- bottomleft
+                (block.rect.bottomleft[1] - env.bird.rect.midbottom[1]) / HEIGHT, # y - bottomleft
                 block.rect.width / 100.0,   # נניח רוחב מקסימלי סביר
                 block.rect.height / 100.0,  # נניח גובה מקסימלי סביר
                 block.angle / 360.0,        # נירמול זווית ל-[0,1]

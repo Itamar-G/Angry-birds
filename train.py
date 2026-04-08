@@ -11,7 +11,7 @@ epochs = 1000001
 C = 500
 batch = 128
 gamma = 0.99
-path = "Data/DQN_PARAM_Advanced_8.pth"
+path = "Data/DQN_PARAM_Advanced_9.pth"
 
 def train():
     state = State()
@@ -22,7 +22,7 @@ def train():
     Q = player.DQN
     Q_hat: DQN = Q.copy()
     Q_hat.train = False
-    optim = torch.optim.Adam(Q.parameters(), lr=0.00001)
+    optim = torch.optim.Adam(Q.parameters(), lr=0.00005)
     
     success_rate = []
     # --- הוספה: רשימות למעקב אחר loss ---
