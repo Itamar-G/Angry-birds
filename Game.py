@@ -6,7 +6,7 @@ import torch
 from Human_agent import Human_agent
 from ai_agent import DQN_Agent
 from State import State
-PATH = "Data/DQN_PARAM_Advanced_8.pth"
+PATH = "Data/DQN_PARAM_Advanced_10.pth"
 
 def show_game_over(screen):
     font = pygame.font.SysFont("Arial", 60)
