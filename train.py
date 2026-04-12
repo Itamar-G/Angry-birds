@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 2000001
+epochs = 3000001
 C = 500
 batch = 128
 gamma = 0.99
-path = "Data/DQN_PARAM_Advanced_10.pth"
+path = "Data/DQN_PARAM_Advanced_11.pth"
 
 def train():
     state = State()
