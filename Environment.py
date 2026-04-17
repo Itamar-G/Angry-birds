@@ -105,7 +105,7 @@ class Environment:
                 self.bird.move = True
                 
                 # הורדת ניקוד על עצם הירייה (כפי שהיה בקוד שלך)
-                self.reward -= 1 
+                self.reward -= 5 
                 self.tries -= 1
                 
                 for pig in list(self.pigs):
@@ -206,7 +206,7 @@ class Environment:
         if self.bird.rect.midbottom[1] > 400 or self.bird.rect.midbottom[0] > 700:
             if hasattr(self, 'pigs_before_shot'):
                 if len(self.pigs) == pigs_before_shot:
-                    self.reward -= 15 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
+                    self.reward -= 20 # קנס על ירייה שלא פגעה בחזיר ויצאה מהמסך
                 delattr(self, 'pigs_before_shot')
             
             self.bird.rect.midbottom = (45, 315)

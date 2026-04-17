@@ -62,9 +62,12 @@ class DQN_Agent:
             actions.append(self.get_action(state, train=train)) #SARSA = True / Q-learning = False
         return torch.tensor(actions)
 
-    def epsilon_greedy(self,epoch, start = epsilon_start, final=epsilon_final, decay=epsiln_decay):
-        res = final + (start - final) * math.exp(-1 * epoch/decay)
-        return res
+    def epsilon_greedy(self, epoch, total_epochs=300000):
+        start = 1.0
+        final = 0.02
+        decay_duration = total_epochs * 0.8
+        epsilon = max(final, start - (start - final) * (epoch / decay_duration))
+        return epsilon
     
     def save_param (self, path):
         self.DQN.save_params(path)

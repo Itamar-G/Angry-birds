@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 3000001
+epochs = 1500001
 C = 500
 batch = 128
 gamma = 0.99
-path = "Data/DQN_PARAM_Advanced_11.pth"
+path = "Data/DQN_PARAM_Advanced_12.pth"
 
 def train():
     state = State()
@@ -41,7 +41,7 @@ def train():
         state_T=state.toTensor(env)
         done = False
         while not done: # nor done:
-            action = player.get_action(state_T, epoch=epoch, train=True)
+            action = player.get_action(state_T, epoch, train=True)
             env.move(action)
             
             while env.bird.move or not env.is_stable():
