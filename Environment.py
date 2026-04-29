@@ -33,7 +33,7 @@ class Environment:
         self.pigs.empty()
         self.blocks.empty()
 
-        num_buildings = random.randint(1, 3)  
+        num_buildings = random.randint(1,3)
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import torch 
-epochs = 1500001
+epochs = 1000001
 C = 500
 batch = 128
 gamma = 0.99

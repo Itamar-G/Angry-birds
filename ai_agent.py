@@ -9,7 +9,7 @@ from State import State
 
 epsilon_start = 1
 epsilon_final = 0.01
-epsiln_decay = 1000000#ככל שמגדילים, יש יותר זמן אקראי
+epsiln_decay = 800000#ככל שמגדילים, יש יותר זמן אקראי
 
 # epochs = 1000
 # batch_size = 64
@@ -64,7 +64,7 @@ class DQN_Agent:
 
     def epsilon_greedy(self, epoch, total_epochs=300000):
         start = 1.0
-        final = 0.02
+        final = 0.01
         decay_duration = total_epochs * 0.8
         epsilon = max(final, start - (start - final) * (epoch / decay_duration))
         return epsilon

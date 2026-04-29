@@ -6,7 +6,7 @@ import torch
 from Human_agent import Human_agent
 from ai_agent import DQN_Agent
 from State import State
-PATH = "Data/DQN_PARAM_Advanced_10.pth"
+PATH = "Data/DQN_PARAM_Advanced_12.pth"
 
 def show_game_over(screen):
     font = pygame.font.SysFont("Arial", 60)
@@ -40,7 +40,6 @@ def main():
         if not env.end_of_game() and env.is_stable():
             state=State()
             state_T=state.toTensor(env)
-            # אפשר להעביר את ה-env כאן אם לא הגדרת אותו ב-init
             #action = player.get_action((45, 315),events)
             action = player.get_action(state_T, train=False) 
             env.move(action)
