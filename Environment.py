@@ -14,8 +14,9 @@ class Environment:
         self.blocks = pygame.sprite.Group()
         self.tries = 3
         self.level = 1
+        self.score = 0  # הוספת ניקוד מצטבר
         self.screen = None
-        self.reward=0
+        self.reward = 0
         self.steps_since_shot = 0
 
     def init_pigs (self,pos):
@@ -32,30 +33,22 @@ class Environment:
         self.tries = 3
         self.pigs.empty()
         self.blocks.empty()
-
-        num_buildings = random.randint(1,3)
+        self.bird.move = False
+        self.bird.rect.midbottom = (45, 315)
+        
+        # ככל שהשלב עולה, אפשר להוסיף יותר מבנים (קושי עולה)
+        num_buildings = min(level_num + 1, 5) 
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
             num_floors = random.randint(1, 3)
-            
-            # משתנה שיעזור לנו לדעת מה הגובה המצטבר של המבנה
             current_top_y = 360 
-
             for i in range(num_floors):
                 is_horizontal = random.random() < 0.3
-                width = 60 if is_horizontal else 20
-                height = 20 if is_horizontal else 60
-                
-                # מיקום הבלוק: התחתית שלו היא ה-top של הקומה הקודמת
+                width, height = (60, 20) if is_horizontal else (20, 60)
                 block = Block((x, current_top_y), width=width, height=height)
                 self.blocks.add(block)
-                
-                # עדכון הגובה לקומה הבאה
                 current_top_y -= height
-
-            # מיקום החזיר: בדיוק על הגג של הקומה האחרונה
-            # current_top_y כרגע מייצג את ה-top של הבלוק העליון ביותר
             self.init_pigs((x, current_top_y))
 
     def init_display(self):
@@ -127,6 +120,7 @@ class Environment:
             pig.stay = False
             if pygame.sprite.collide_mask(pig, self.bird):
                 self.reward += 15
+                self.score += 3
                 pig.kill()
             for block in self.blocks:
                 if pygame.sprite.collide_mask(pig, block):
@@ -251,17 +245,17 @@ class Environment:
         pygame.display.update()
         self.clock.tick(FPS)
 
-    def end_of_game (self):
-        if self.bird.move:
+    def calculate_win_bonus(self):
+        # חישוב בונוס לפי מספר ציפורים שנותרו
+        if self.tries == 2: return 15  # נשארו 2 (השתמש ב-1)
+        if self.tries == 1: return 10  # נשארו 1 (השתמש ב-2)
+        if self.tries == 0: return 5   # נשארו 0 (השתמש ב-3)
+        return 0
+    
+    def end_of_game(self):
+        if not self.is_stable():
             return False
-        for block in self.blocks:
-            if block.angle<360 and block.angle>270:
-                return False
-        if len(self.pigs)==0:
-            self.reward=0
-            return True
-        if self.tries==0: 
-            self.reward=0
+        if len(self.pigs) == 0 or self.tries == 0:
             return True
         return False
     

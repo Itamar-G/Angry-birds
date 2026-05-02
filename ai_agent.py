@@ -9,7 +9,6 @@ from State import State
 
 epsilon_start = 1
 epsilon_final = 0.01
-epsiln_decay = 800000#ככל שמגדילים, יש יותר זמן אקראי
 
 # epochs = 1000
 # batch_size = 64
@@ -62,7 +61,7 @@ class DQN_Agent:
             actions.append(self.get_action(state, train=train)) #SARSA = True / Q-learning = False
         return torch.tensor(actions)
 
-    def epsilon_greedy(self, epoch, total_epochs=300000):
+    def epsilon_greedy(self, epoch, total_epochs=1000000):
         start = 1.0
         final = 0.01
         decay_duration = total_epochs * 0.8
