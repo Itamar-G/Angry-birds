@@ -162,10 +162,19 @@ class Environment:
                             break
 
             # הרצת הנפילה/סיבוב הפיזיקלי
+            if block.falling or block.vy > 0:
+                for pig in list(self.pigs):
+                    if pygame.sprite.collide_mask(block, pig):
+                        # הבלוק מחץ את החזיר
+                        self.score += 3      # הוספת ניקוד
+                        self.reward += 15    # חיזוק חיובי לסוכן ה-AI
+                        pig.kill()           # הסרת החזיר מהמסך
+            
+            # הרצת הנפילה הפיזיקלית (הקוד הקיים שלך)
             if block.falling:
                 block.fall()
             else:
-                block.vy = 0 # איפוס מהירות אם הוא יציב
+                block.vy = 0
 
             # טיפול בהתנגשות עם הציפור (נשאר דומה)
             if pygame.sprite.collide_mask(block, self.bird):
