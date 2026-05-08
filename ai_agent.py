@@ -64,7 +64,7 @@ class DQN_Agent:
     def epsilon_greedy(self, epoch, total_epochs=1000000):
         start = 1.0
         final = 0.01
-        decay_duration = total_epochs * 0.8
+        decay_duration = total_epochs * 0.5
         epsilon = max(final, start - (start - final) * (epoch / decay_duration))
         return epsilon
     

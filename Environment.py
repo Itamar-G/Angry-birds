@@ -35,9 +35,9 @@ class Environment:
         self.blocks.empty()
         self.bird.move = False
         self.bird.rect.midbottom = (45, 315)
-        
-        # ככל שהשלב עולה, אפשר להוסיף יותר מבנים (קושי עולה)
-        num_buildings = min(level_num + 1, 5) 
+        if level_num <3:
+            num_buildings = level_num
+        else: num_buildings = random.randint(1, 3)
 
         for _ in range(num_buildings):
             x = random.randint(250, 600)
@@ -119,7 +119,7 @@ class Environment:
         for pig in list(self.pigs):
             pig.stay = False
             if pygame.sprite.collide_mask(pig, self.bird):
-                self.reward += 15
+                self.reward += 10
                 self.score += 3
                 pig.kill()
             for block in self.blocks:
@@ -162,12 +162,12 @@ class Environment:
                             break
 
             # הרצת הנפילה/סיבוב הפיזיקלי
-            if block.falling or block.vy > 0:
+            if block.falling and block.vy > 2:
                 for pig in list(self.pigs):
                     if pygame.sprite.collide_mask(block, pig):
                         # הבלוק מחץ את החזיר
                         self.score += 3      # הוספת ניקוד
-                        self.reward += 15    # חיזוק חיובי לסוכן ה-AI
+                        self.reward += 10    # חיזוק חיובי לסוכן ה-AI
                         pig.kill()           # הסרת החזיר מהמסך
             
             # הרצת הנפילה הפיזיקלית (הקוד הקיים שלך)
@@ -183,6 +183,7 @@ class Environment:
                         self.reward += 4
                 block.rect.midbottom = (block.rect.midbottom[0] + self.bird.vx * 2 + 30,
                                         block.rect.midbottom[1])
+                self.reward+= self.bird.vx * 0.1
                 # סימון הבלוק שיתחיל ליפול/להסתובב אחרי המכה
                 block.angle -= 1 
                 block.hit += 1
