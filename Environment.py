@@ -14,7 +14,7 @@ class Environment:
         self.blocks = pygame.sprite.Group()
         self.tries = 3
         self.level = 1
-        self.score = 0  # הוספת ניקוד מצטבר
+        self.score = 0
         self.screen = None
         self.reward = 0
         self.steps_since_shot = 0
@@ -83,11 +83,8 @@ class Environment:
             block.vy = 0
             block.falling = False
 
-    def move(self, action):
-        # — אם יש פעולה (action לא None) — בצע ירייה / התחל תנועה
-        
-        done = False
-        
+    def move(self, action):        
+        done = False      
         if action is not None:
             if not self.bird.move:
                 # שמירת כמות החזירים ברגע הירייה כדי לבדוק פגיעה בהמשך
@@ -96,8 +93,6 @@ class Environment:
                 self.bird.vx = (action[0] + 1) * 3
                 self.bird.vy = (action[1] - 1) * (-5)
                 self.bird.move = True
-                
-                # הורדת ניקוד על עצם הירייה (כפי שהיה בקוד שלך)
                 self.reward -= 5 
                 self.tries -= 1
                 
@@ -112,8 +107,6 @@ class Environment:
                     check = False
             if check:
                 self.bird.Move()
-
-        # התנגשויות ציפור-חזירים
         
         # עדכון חזירים: נפילה, בדיקות קרקע וכו׳
         for pig in list(self.pigs):
@@ -132,8 +125,6 @@ class Environment:
                 pig.stay = True
                 pig.kill()
                 self.reward += 10
-
-        # --- עדכון בלוקים: לוגיקת נפילה משופרת ---
         
         # שלב א': נמיין את הבלוקים מלמטה למעלה (לפי Y) כדי שנוכל לבדוק יציבות מהקרקע מעלה
         sorted_blocks = sorted(list(self.blocks), key=lambda b: b.rect.bottom, reverse=True)
@@ -166,17 +157,15 @@ class Environment:
                 for pig in list(self.pigs):
                     if pygame.sprite.collide_mask(block, pig):
                         # הבלוק מחץ את החזיר
-                        self.score += 3      # הוספת ניקוד
-                        self.reward += 10    # חיזוק חיובי לסוכן ה-AI
-                        pig.kill()           # הסרת החזיר מהמסך
+                        self.score += 3      
+                        self.reward += 10    
+                        pig.kill()   
             
-            # הרצת הנפילה הפיזיקלית (הקוד הקיים שלך)
             if block.falling:
                 block.fall()
             else:
                 block.vy = 0
 
-            # טיפול בהתנגשות עם הציפור (נשאר דומה)
             if pygame.sprite.collide_mask(block, self.bird):
                 for pig in list(self.pigs):
                     if pygame.sprite.collide_mask(block, pig):
@@ -257,9 +246,9 @@ class Environment:
 
     def calculate_win_bonus(self):
         # חישוב בונוס לפי מספר ציפורים שנותרו
-        if self.tries == 2: return 15  # נשארו 2 (השתמש ב-1)
-        if self.tries == 1: return 10  # נשארו 1 (השתמש ב-2)
-        if self.tries == 0: return 5   # נשארו 0 (השתמש ב-3)
+        if self.tries == 2: return 15 
+        if self.tries == 1: return 10
+        if self.tries == 0: return 5 
         return 0
     
     def end_of_game(self):
@@ -275,12 +264,9 @@ class Environment:
         self.tries = 3
         self.pigs.empty()
         self.blocks.empty()
-        # אתחל HUD / ריסט של bird
         self.bird = Bird()
         # אתחול מחדש של stage/level
         self.init_level(self.level)
-        # אם צריך — גם אתחול של display / screen
-        # self.init_display()  # תלוי אם אתה רוצה לפתוח חלון מחדש
         # החזר וקטור מצב התחלתי  
         return self.get_state()
     def is_win(self):

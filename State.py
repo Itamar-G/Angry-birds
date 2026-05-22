@@ -13,7 +13,7 @@ class State:
     def build(self, env):
         state_list = []
         
-        # 1. נירמול מספר הניסיונות (נניח מקסימום 3)
+        #1. נירמול מספר הניסיונות
         state_list.append(env.tries)
 
         # 2. Pigs state – נירמול מיקומים ביחס לרוחב וגובה המסך
@@ -33,10 +33,10 @@ class State:
             state_list += [
                 (block.rect.bottomleft[0] - env.bird.rect.midbottom[0]) / WIDTH, # x -- bottomleft
                 (block.rect.bottomleft[1] - env.bird.rect.midbottom[1]) / HEIGHT, # y - bottomleft
-                block.rect.width / 100.0,   # נניח רוחב מקסימלי סביר
-                block.rect.height / 100.0,  # נניח גובה מקסימלי סביר
-                block.angle / 360.0,        # נירמול זווית ל-[0,1]
-                block.hit / 2.0             # נירמול פגיעות (נהרס ב-2)
+                block.rect.width / 100.0, 
+                block.rect.height / 100.0,
+                block.angle / 360.0,
+                block.hit / 2.0
             ]
         
         # Fill remaining blocks

@@ -25,10 +25,8 @@ def train():
     optim = torch.optim.Adam(Q.parameters(), lr=0.00005)
     
     success_rate = []
-    # --- הוספה: רשימות למעקב אחר loss ---
     loss_history = []
     current_epoch_losses = [] 
-    # -----------------------------------
     good = False
     for epoch in range(epochs):
         if epoch % C == 0: 
@@ -36,11 +34,10 @@ def train():
         
         env.reset()
         pigs = len(env.pigs)
-        tries = env.tries
         print(epoch, end="\r")
         state_T=state.toTensor(env)
         done = False
-        while not done: # nor done:
+        while not done:
             action = player.get_action(state_T, epoch, train=True)
             env.move(action)
             
@@ -49,19 +46,17 @@ def train():
                 #env.render()
             next_state_T = state.toTensor(env)
             
-            pigs = len(env.pigs)
-            tries = env.tries
-            
+            pigs = len(env.pigs)          
             replay.push(state_T, action, reward, next_state_T, done)
             state_T = next_state_T.clone()
-            
+    
             if epoch < 500:
                 continue
                 
             states, actions, rewards, next_states, dones = replay.sample(batch)
             indices = (actions[:, 0] * 10 + actions[:, 1]).long().unsqueeze(1)
             Q_values = Q(states).gather(1, indices)
-            next_actions = player.get_actions(next_states, dones, train=True)
+            #next_actions = player.get_actions(next_states, dones, train=True) SARSA
             
             with torch.no_grad():
                 # במקום get_actions, אנחנו לוקחים את הערך המקסימלי שהרשת חוזה למצב הבא
@@ -69,12 +64,11 @@ def train():
                 # חישוב ה-Target לפי משוואת בלמן
                 target_Q = rewards + (gamma * Q_hat_Values * (1 - dones))
 
-            # חישוב ה-Loss בין הערכים הנוכחיים ל-Target
+            # חישוב ה Loss
             loss = HuberLoss(Q_values, target_Q)
-            # --- הוספה: שמירת ערך ה-loss הנוכחי ---
             current_epoch_losses.append(loss.item())
-            # ------------------------------------
             
+            #עדכון הרשת
             loss.backward()
             torch.nn.utils.clip_grad_norm_(Q.parameters(), max_norm=1.0)
             optim.step()
@@ -85,8 +79,7 @@ def train():
             
         if epoch % C == 0 and epoch != 0:
             Q_hat.load_state_dict(Q.state_dict())
-            
-            # --- הוספה: חישוב ממוצע ה-loss לבלוק של 500/1000 איטרציות ---
+
             if current_epoch_losses:
                 avg_loss = sum(current_epoch_losses) / len(current_epoch_losses)
                 loss_history.append(avg_loss)

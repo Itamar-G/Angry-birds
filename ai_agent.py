@@ -10,8 +10,6 @@ from State import State
 epsilon_start = 1
 epsilon_final = 0.01
 
-# epochs = 1000
-# batch_size = 64
 gamma = 0.99 
 MSELoss = nn.MSELoss()
 class DQN_Agent:
@@ -36,10 +34,7 @@ class DQN_Agent:
         actionsy = torch.arange(10)
         if train and rnd < epsilon:
             return random.choice(actionsx),random.choice(actionsy)
-        # xx, yy = torch.meshgrid(actionsx, actionsy, indexing="ij")
-        # action_pairs = torch.stack([xx.flatten(), yy.flatten()], dim=1)
-        # expand_state = state_tensor.unsqueeze(0).repeat(action_pairs.shape[0], 1)
-
+       
         with torch.no_grad():
             Q_values = self.DQN(state_T)
         # shape: [100]
@@ -57,7 +52,7 @@ class DQN_Agent:
 
     def get_actions (self, states, dones, train = True):
         actions = []
-        for i, state in enumerate(states):
+        for state in enumerate(states):
             actions.append(self.get_action(state, train=train)) #SARSA = True / Q-learning = False
         return torch.tensor(actions)
 

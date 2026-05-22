@@ -9,7 +9,7 @@ from State import *
 import os
 HuberLoss = nn.SmoothL1Loss()
 env=Environment()
-input_size = 1 + 2*max_pigs + 6*max_blocks # וודא ש-max_blocks מעודכן ל-2 לפחות
+input_size = 1 + 2*max_pigs + 6*max_blocks
 output_size = 100
 gamma = 0.99
 
@@ -30,8 +30,6 @@ class DQN(nn.Module):
     def load_params(self, path):
         self.load_state_dict(torch.load(path))
 
-    import os   # אם אין למעלה בקובץ
-
     def save_params(self, path):
         dir_name = os.path.dirname(path)
         if dir_name != "":
@@ -46,8 +44,6 @@ class DQN(nn.Module):
     def loss(self, Q_value, rewards, Q_next_Values, Dones):
         # חישוב ה-Target לפי משוואת בלמן
         Q_new = rewards + gamma * Q_next_Values * (1 - Dones)
-        
-        # שימוש ב-Huber Loss במקום MSE
         return HuberLoss(Q_value, Q_new)
 
     def __call__(self, states, actions=None):
