@@ -11,7 +11,6 @@ epsilon_start = 1
 epsilon_final = 0.01
 
 gamma = 0.99 
-MSELoss = nn.MSELoss()
 class DQN_Agent:
     def __init__(self, parametes_path = None, train = True, env= None) -> None:
         self.DQN = DQN()
