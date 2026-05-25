@@ -11,8 +11,8 @@ PATH = "Data/DQN_PARAM_Advanced_11.pth"
 def main():
     env = Environment()
     env.init_display()
-    player = DQN_Agent(parametes_path=PATH, env=env)
-    #player = Human_agent() 
+    #player = DQN_Agent(parametes_path=PATH, env=env)
+    player = Human_agent() 
     
     font = pygame.font.SysFont("Arial", 32)
     game_running = True
@@ -37,8 +37,8 @@ def main():
             # החלטת סוכן
             if env.is_stable() and not env.end_of_game():
                 state_T = env.get_state().toTensor(env)
-                action = player.get_action(state_T, train=False)
-                #action = player.get_action((45,315), pygame.event.get())
+                #action = player.get_action(state_T, train=False)
+                action = player.get_action((45,315))
                 env.move(action)
 
             # בדיקת סיום שלב

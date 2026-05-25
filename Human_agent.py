@@ -2,9 +2,9 @@ import pygame
 class Human_agent:
     def __init__(self):
         pass
-    def get_action (self,pos,events=None,state=None):
+    def get_action (self,pos):
         
-        for event in events:
+        for event in pygame.event.get():
             
             if event.type==pygame.MOUSEBUTTONUP:
                 pos2= pygame.mouse.get_pos()
