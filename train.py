@@ -70,8 +70,8 @@ def train():
             
             #עדכון הרשת
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(Q.parameters(), max_norm=1.0)
-            optim.step()
+            torch.nn.utils.clip_grad_norm_(Q.parameters(), max_norm=1.0)#חותך את הגרדיאנים הגדולים מידי
+            optim.step() # w = w - lr * grad
             optim.zero_grad()
 
         if pigs == 0: 
