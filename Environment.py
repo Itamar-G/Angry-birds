@@ -187,7 +187,7 @@ class Environment:
             if block.hit >= 2:
                 block.kill()    
 
-        if not self.is_stable():
+        if not self.is_stable() and self.bird.move==False:
             self.steps_since_shot += 1
         # בדיקה אם עבר יותר מדי זמן ללא התייצבות
         if self.steps_since_shot > 100:
